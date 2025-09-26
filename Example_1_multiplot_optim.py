@@ -1,8 +1,10 @@
 #from __future__ import annotations
 
 import pyvista as pv
-from sp_problems import ex1 as sd, stg
+from supg.sp_problems import dat1 as dat, stg
+from supg import supg
 
+sd = supg.data(*dat, False)
 sd.set_weights(1e-1)
 weights = sd.yh.x.array
 

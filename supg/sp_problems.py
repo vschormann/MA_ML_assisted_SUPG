@@ -30,9 +30,9 @@ b = ufl.as_vector((fem.Constant(domain, default_scalar_type(1.0)),fem.Constant(d
 c = fem.Constant(domain, default_scalar_type(0.0))
 f = fem.Constant(domain, default_scalar_type(1.0))
 bcs = [fem.dirichletbc(fem.Constant(domain, default_scalar_type(0.0)), boundary_dofs, Wh)]
-ex1 = supg.data(domain, Wh,eps,b,c,f,bcs, False)
-dat1 = domain, Wh,eps,b,c,f,bcs, False
-ex1.set_weights(1e-1)
+
+dat1 = domain, Wh,eps,b,c,f,bcs
+
 
 #Ex 2
 eps = fem.Constant(domain, default_scalar_type(10**(-3)))
@@ -44,8 +44,7 @@ u_exact = fem.Expression(expr, Wh.element.interpolation_points())
 uD = fem.Function(Wh)
 uD.interpolate(u_exact)
 bcs = [fem.dirichletbc(uD, boundary_dofs)]
-ex2 = supg.data(domain, Wh,eps,b,c,f,bcs)
-ex2.set_weights(1e-2)
+dat2 = domain, Wh,eps,b,c,f,bcs
 
 #Ex 3
 
@@ -58,8 +57,7 @@ u_exact = fem.Expression(expr, Wh.element.interpolation_points())
 uD = fem.Function(Wh)
 uD.interpolate(u_exact)
 bcs = [fem.dirichletbc(uD, boundary_dofs)]
-ex3 = supg.data(domain, Wh, eps, b,c,f,bcs)
-ex3.set_weights(0.09)
+dat3 = domain, Wh, eps, b,c,f,bcs
 
 #Ex 4
 
@@ -72,7 +70,6 @@ u_exact = fem.Expression(expr, Wh.element.interpolation_points())
 uD = fem.Function(Wh)
 uD.interpolate(u_exact)
 bcs = [fem.dirichletbc(uD, boundary_dofs)]
-ex4 = supg.data(domain, Wh, eps,b,c,f,bcs)
-ex4.set_weights(0.1e-1)
+dat4 = domain, Wh, eps,b,c,f,bcs
 
 stg = fem_plotter_grid(Wh)

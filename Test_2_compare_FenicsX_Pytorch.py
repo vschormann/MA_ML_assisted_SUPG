@@ -1,12 +1,13 @@
-import sp_problems
+from supg.sp_problems import dat1
+from supg import supg
 from torch_classes.supg_torch import supg_loss
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import nn_models
+import torch_classes.nn_models as nn_models
 
 
-sd = sp_problems.ex1
+sd = supg.data(*dat1, False)
 
 sd.set_weights(1e-1)
 model = nn_models.md1(torch.Tensor(sd.yh.x.array).view(1,-1))
