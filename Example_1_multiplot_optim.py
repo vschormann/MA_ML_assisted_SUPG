@@ -10,10 +10,10 @@ weights = sd.yh.x.array
 
 learning_rate = 1e-3
 
-filename = 'optim-loop.gif'
+filename = 'optim-loop.mp4'
 
 p = pv.Plotter(notebook=True, shape=(2,2))
-p.open_gif(filename)
+p.open_movie(filename)
 
 p.subplot(0,0)
 stg.add_data(sd.uh)
