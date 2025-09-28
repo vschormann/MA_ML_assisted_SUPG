@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>index</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>v1.0</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7510,27 +7510,224 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9265b556">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Documentation-of-progress">Documentation of progress<a class="anchor-link" href="#Documentation-of-progress">¶</a></h1><p>In order to possibly improve on the models provided in the literaure, it is expected that some experiamentation will be necessary. 
-Here visualizations and observations will be documented ordered by release.</p>
-</div>
-</div>
-</div>
-</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=42a94eae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h1 id="Release-v1.0">Release v1.0<a class="anchor-link" href="#Release-v1.0">¶</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=377eedcb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="1.-Gradient-descend-optimization-loop">1. Gradient descend optimization loop<a class="anchor-link" href="#1.-Gradient-descend-optimization-loop">¶</a></h2><p>This video was made using Pyvista. An implementation can be found in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_1_multiplot_optim.py">Example_1_multiplot_optim</a>. It ensures that the data for the solution of the approximation, the SUPG-parameters (weights), the local loss-values and the gradient are actually updated in the loop and thus that all the components work as expected. It is clear that not all of the windows plotted here will be evaluated in later examinations, since for example the weights depend linearly on the gradients.</p>
+<h3 id="Problem:">Problem:<a class="anchor-link" href="#Problem:">¶</a></h3><p>The convection diffusion problem consideren here is:</p>
 <ul>
-<li><a href="https://vschormann.github.io/MA_ML_assisted_SUPG/v1.0.html">Release v1.0</a></li>
+<li>$\Omega=(0,1)^2,\ \Gamma^D=\Gamma,\ \varepsilon = 10^{-8},\ \mathbf{b}=(1,0)^T,\ c=0,\ f=1,\ u_D=0$.</li>
+<li>The initial choice of weigts is $0.1$ on all cells.</li>
+<li>The loss function is not evaluated on the Dirichlet boundary.</li>
 </ul>
+<h3 id="Observations:">Observations:<a class="anchor-link" href="#Observations:">¶</a></h3><ol>
+<li>Weights were initialized a bit too high. which can be seen in the first window where the solution is more flattened than it should be. When the loop starts, we can see how the weights in the region of the layer are reduced which leads to steeper gradients in the solution.</li>
+<li>Since there is no boundary evaluation, the clearly visible errors in the boundary do not contribute to the local loss and remain zero at the boundary. The optimization loop however is still mainly altering the values at the layers in the boundary.</li>
+<li>The gradient vanishes everywhere except close to the boundary which leads to no changes in the weights in these areas. Taking point 1 into consideration, it is unlikely that the coice of the weights in these areas is optimal. We will introduce a regularization term leter to mitigate that and possibly experiment with other pertubation methods in the loss function.</li>
+<li>Sporious oscillations can still be seen in the boundary. It remains to check whether it makes a difference to include boundary evaluation.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d19f1069">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Video Demo</title>
+</head>
+<body>
+<h1>SGD-optim loop</h1>
+<video controls="" width="640">
+<source src="https://github.com/vschormann/MA_ML_assisted_SUPG/releases/download/viz_data/optim-loop.mp4" type="video/mp4"/>
+    Your browser does not support the video tag.
+  </video>
+</body>
+</html>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6309d7ad">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-Evaluation-of-the-boundary">2. Evaluation of the boundary<a class="anchor-link" href="#2.-Evaluation-of-the-boundary">¶</a></h2><p>This is a follow on the questions that arise from the observations above. Mainly we want to check whether enabling boundary evaluation can resolve the oscillations in the layers. Here a Pytorch SGD optimization loop is implemented which is equivalent to the gradient descend from <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_1_multiplot_optim.py">Example 1</a> as is shown in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Test_2_compare_FenicsX_Pytorch.py">Test 2</a>. There are two supg.data-objects initialized with the same data except one has boundary_eval turned on and the other not.</p>
+<h2 id="Observations">Observations<a class="anchor-link" href="#Observations">¶</a></h2><ol>
+<li>Boundary evaluation leads to drastically different results in the solution. We can see more smearing and and the prediction overshoots trying to compensate the large loss term in the boundary layer.</li>
+</ol>
+<h2 id="Conjecture">Conjecture<a class="anchor-link" href="#Conjecture">¶</a></h2><p>If we have inner layers, like in example problem 4, removing boundary evaluation might not yield satisfactory results because the local loss term in the layer might dominate the optimization algorithm. Removing this area with a custom meshtag and ufl measure might mitigate this problem. To be tested in next Release.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6007a8a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Video Demo</title>
+</head>
+<body>
+<h1>Boundary_eval compare</h1>
+<video controls="" width="640">
+<source src="https://github.com/vschormann/MA_ML_assisted_SUPG/releases/download/viz_data/boundary_eval_compare.mp4" type="video/mp4"/>
+    Your browser does not support the video tag.
+  </video>
+</body>
+</html>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bc4195a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-Fully-conected-Network-vs.-gradient-descent">3. Fully conected Network vs. gradient descent<a class="anchor-link" href="#3.-Fully-conected-Network-vs.-gradient-descent">¶</a></h2><p>Here we used the same example as above and a fully connected neural network let it train for 1.500 iterations with randomly initialized weights. After that anoth supg.data-object is initialized with the weights from the last forward pass. The first object continues to be optimized by the neural network. The second by a standard gradient descent.</p>
+<h3 id="Implementation-details">Implementation details<a class="anchor-link" href="#Implementation-details">¶</a></h3><ul>
+<li>The loss term of the neural network has a regularization term added which is just an MSE-loss function with target value 0 for each weight.</li>
+<li>The neural network takes tabulated input data (eps, b_1, b_2, c, f) averaged over all cells and runs them through a pooling layer with 5 outputs. In this case those are just the values of the functions in the problem data since they are constant.</li>
+<li>The data is then run through two hidden layers that have 16 nodes each and are full connected.</li>
+<li>This is essentially the AiStab-NN $_\theta$ from <a href="https://www.sciencedirect.com/science/article/pii/S0021999123007970">Artificial neural network-augmented stabilized finite element method</a> that Yadav and Ganesan introduced without pre- and post-processing.</li>
+</ul>
+<h3 id="Observations">Observations<a class="anchor-link" href="#Observations">¶</a></h3><ol>
+<li>As expected both models behave differently.</li>
+<li>in this iteration, the neural network is able to handle the gap in the initial solution. However it is noteworthy that this gap was caused by initializing the network with random weights and without pre- and post-processing.</li>
+<li>Repeating the code in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_2_model_compare.py">Example 2</a> that was used to create this video yields noticeably different results each time.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1f7498bb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Video Demo</title>
+</head>
+<body>
+<h1>5-16-16-100 NN vs SGD</h1>
+<video controls="" width="640">
+<source src="https://github.com/vschormann/MA_ML_assisted_SUPG/releases/download/viz_data/model_compare.mp4" type="video/mp4"/>
+    Your browser does not support the video tag.
+  </video>
+</body>
+</html>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=37509871">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Arranging-DOFs-in-2-dimensions">Arranging DOFs in 2 dimensions<a class="anchor-link" href="#Arranging-DOFs-in-2-dimensions">¶</a></h2><p>In order to reshape the one dimensional DOF-array to a two dimensional array the points need to be arranged by there geometrical position. As seen here, the grid on the unit_square is arranged in a diagonal pattern.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bc8acf88">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">supg.sp_problems</span> <span class="kn">import</span> <span class="n">dat1</span>
+<span class="kn">from</span> <span class="nn">supg</span> <span class="kn">import</span> <span class="n">supg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">sd</span> <span class="o">=</span> <span class="n">supg</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="o">*</span><span class="n">dat1</span><span class="p">)</span>
+
+<span class="n">pts</span> <span class="o">=</span> <span class="n">sd</span><span class="o">.</span><span class="n">tabulate_problem_data</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">pts</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">pts</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]))]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">pts</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">pts</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=07d46884">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>This can also be seen by ploting a simple DG0-function.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cfcc0999">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">supg.sp_problems</span> <span class="kn">import</span> <span class="n">domain</span><span class="p">,</span> <span class="n">stg</span>
+<span class="kn">import</span> <span class="nn">dolfinx.fem</span> <span class="k">as</span> <span class="nn">fem</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyvista</span> <span class="k">as</span> <span class="nn">pv</span>
+
+<span class="n">Ch</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="p">(</span><span class="s1">'DG'</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">cell_scalar_fn</span> <span class="o">=</span> <span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">Ch</span><span class="p">)</span>
+<span class="n">cell_scalar_fn</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cell_scalar_fn</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">))</span>
+
+<span class="n">cell_scalar_fn</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">scatter_forward</span><span class="p">()</span>
+
+<span class="n">stg</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">cell_scalar_fn</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plotter</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="n">stg</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">show_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">camera_position</span><span class="o">=</span><span class="s1">'xy'</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
