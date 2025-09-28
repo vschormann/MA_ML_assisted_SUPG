@@ -7527,7 +7527,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Gradient-descend-optimization-loop">1. Gradient descend optimization loop<a class="anchor-link" href="#1.-Gradient-descend-optimization-loop">¶</a></h2><p>This video was made using Pyvista. An implementation can be found in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_1_multiplot_optim.py">Example_1_multiplot_optim</a>. It ensures that the data for the solution of the approximation, the SUPG-parameters (weights), the local loss-values and the gradient are actually updated in the loop and thus that all the components work as expected. It is clear that not all of the windows plotted here will be evaluated in later examinations, since for example the weights depend linearly on the gradients.</p>
+<h2 id="1.-Gradient-descend-optimization-loop">1. Gradient descend optimization loop<a class="anchor-link" href="#1.-Gradient-descend-optimization-loop">¶</a></h2><p>This video was made using Pyvista. An implementation can be found in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Examples/Example_1_multiplot_optim.py">Example_1_multiplot_optim</a>. It ensures that the data for the solution of the approximation, the SUPG-parameters (weights), the local loss-values and the gradient are actually updated in the loop and thus that all the components work as expected. It is clear that not all of the windows plotted here will be evaluated in later examinations, since for example the weights depend linearly on the gradients.</p>
 <h3 id="Problem:">Problem:<a class="anchor-link" href="#Problem:">¶</a></h3><p>The convection diffusion problem consideren here is:</p>
 <ul>
 <li>$\Omega=(0,1)^2,\ \Gamma^D=\Gamma,\ \varepsilon = 10^{-8},\ \mathbf{b}=(1,0)^T,\ c=0,\ f=1,\ u_D=0$.</li>
@@ -7575,7 +7575,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Evaluation-of-the-boundary">2. Evaluation of the boundary<a class="anchor-link" href="#2.-Evaluation-of-the-boundary">¶</a></h2><p>This is a follow on the questions that arise from the observations above. Mainly we want to check whether enabling boundary evaluation can resolve the oscillations in the layers. Here a Pytorch SGD optimization loop is implemented which is equivalent to the gradient descend from <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_1_multiplot_optim.py">Example 1</a> as is shown in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Test_2_compare_FenicsX_Pytorch.py">Test 2</a>. There are two supg.data-objects initialized with the same data except one has boundary_eval turned on and the other not.</p>
+<h2 id="2.-Evaluation-of-the-boundary">2. Evaluation of the boundary<a class="anchor-link" href="#2.-Evaluation-of-the-boundary">¶</a></h2><p>This is a follow on the questions that arise from the observations above. Mainly we want to check whether enabling boundary evaluation can resolve the oscillations in the layers. Here a Pytorch SGD optimization loop is implemented which is equivalent to the gradient descend from <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Examples/Example_1_multiplot_optim.py">Example 1</a> as is shown in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Tests/Test_2_compare_FenicsX_Pytorch.py">Test 2</a>. There are two supg.data-objects initialized with the same data except one has boundary_eval turned on and the other not.</p>
 <h2 id="Observations">Observations<a class="anchor-link" href="#Observations">¶</a></h2><ol>
 <li>Boundary evaluation leads to drastically different results in the solution. We can see more smearing and and the prediction overshoots trying to compensate the large loss term in the boundary layer.</li>
 </ol>
@@ -7625,7 +7625,7 @@ a.anchor-link {
 <h3 id="Observations">Observations<a class="anchor-link" href="#Observations">¶</a></h3><ol>
 <li>As expected both models behave differently.</li>
 <li>in this iteration, the neural network is able to handle the gap in the initial solution. However it is noteworthy that this gap was caused by initializing the network with random weights and without pre- and post-processing.</li>
-<li>Repeating the code in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Example_2_model_compare.py">Example 2</a> that was used to create this video yields noticeably different results each time.</li>
+<li>Repeating the code in <a href="https://github.com/vschormann/MA_ML_assisted_SUPG/blob/main/Examples/Example_2_model_compare.py">Example 2</a> that was used to create this video yields noticeably different results each time.</li>
 </ol>
 </div>
 </div>
