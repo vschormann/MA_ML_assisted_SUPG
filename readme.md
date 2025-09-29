@@ -1,13 +1,13 @@
 # Readme
 This repository stores code for my masters thesis to create machine learning models for optimizing SUPG-parameters for singularly perturbed convection diffusion problems. [Acknowledgements](#acknowledgements) for the frameworks used are at the end of the file. Here is a short description.
 
-FEM-routines are implemented using Fenicsx - in particular [Dolfinx](doi.org/10.5281/zenodo.10447666) and [UFL](https://dl.acm.org/doi/10.1145/2566630). Additional computations are done using [NumPy](https://www.nature.com/articles/s41586-020-2649-2). Visualizations use [Pyvista](https://joss.theoj.org/papers/10.21105/joss.01450) and [Matplotlib](https://ieeexplore.ieee.org/document/4160265).
+FEM-routines are implemented using FEniCsx - in particular [Dolfinx](doi.org/10.5281/zenodo.10447666) and [UFL](https://dl.acm.org/doi/10.1145/2566630). Additional computations are done using [NumPy](https://www.nature.com/articles/s41586-020-2649-2). Visualizations use [Pyvista](https://joss.theoj.org/papers/10.21105/joss.01450) and [Matplotlib](https://ieeexplore.ieee.org/document/4160265).
 
 [Pytorch](https://arxiv.org/abs/1912.01703v1) is used to implement the Neutral Networks.
 
 
 # Modules
-Currently there are two modules in this project. One to handle FEM-computations using Fenicsx and one to bridge Fenicsx and Pytorch.
+Currently there are two modules in this project. One to handle FEM-computations using FEniCsx and one to bridge FEniCsx and Pytorch.
 
 ## [supg](/supg/) 
 This module stores a [class](/supg/supg.py) that stores solvers for the SUPG-approximation, the gradient with respect to the SUPG-parameters, the loss value and a local loss on the individual cells. The object can be initialized with the following data
