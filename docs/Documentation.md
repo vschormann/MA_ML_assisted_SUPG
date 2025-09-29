@@ -1,7 +1,9 @@
-# Modules
+# Documentation
+
+## Modules
 Currently there are two modules in this project. One to handle FEM-computations using FEniCsx and one to bridge FEniCsx and Pytorch.
 
-## [supg](/supg/) 
+### [supg](/supg/) 
 This module stores a [class](/supg/supg.py) that stores solvers for the SUPG-approximation, the gradient with respect to the SUPG-parameters, the loss value and a local loss on the individual cells. The object can be initialized with the following data
 - domain: dolfinx.mesh.Mesh
 - Wh: dolfinx.fem.FunctionSpace
@@ -24,7 +26,7 @@ The module also contains a [convenience class](/supg/plotter.py) that stores a p
 
 There is additional functionality for tabulating and visualizing functions on facets to evaluate jumps. But currently it isn't used in any of the routines and might be removed or moved to a different file later.
 
-## [torch_classes](/torch_classes/)
+### [torch_classes](/torch_classes/)
 This module creates a bridge between Pytorch and Dolfinx by subclassing torch.autograd.Function. The [object](/torch_classes/supg_torch.py) takes 
 - a supg.data-object and
 - a torch.Tensor

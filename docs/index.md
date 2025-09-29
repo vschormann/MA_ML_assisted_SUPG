@@ -8,7 +8,7 @@ FEM-routines are implemented using Fenicsx - in particular [Dolfinx](doi.org/10.
 
 [Pytorch](https://arxiv.org/abs/1912.01703v1) is used to implement the Neutral Networks.
 
-# Documentation(https://vschormann.github.io/MA_ML_assisted_SUPG/Documentation)
+# [Documentation](https://vschormann.github.io/MA_ML_assisted_SUPG/Documentation)
 There is a minimal [documentation](https://vschormann.github.io/MA_ML_assisted_SUPG/Documentation) for the code implemented [here](https://vschormann.github.io/MA_ML_assisted_SUPG/Documentation). Documentation [FEniCsx](https://fenicsproject.org/documentation/) and [Pytorch](https://docs.pytorch.org/docs/stable/index.html?ajs_aid=a44c4b02-762c-4421-9cbd-50aa6fedf3f8) can be found on the respective websites.
 
 # Documentation of progress
