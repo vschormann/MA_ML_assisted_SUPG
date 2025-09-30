@@ -139,34 +139,6 @@ class data:
         
         return self.grd_fn.x.array
 
-    def tabulate_problem_data(self):
-        func = fem.Function(self.Yh)
-        
-        dat = [self.eps, self.b[0], self.b[1], self.c, self.f]
-
-        lhs = self.y * ufl.dx
-        retlist = [self.Yh.tabulate_dof_coordinates()[:,:self.domain.topology.dim]]
-        datlist = []
-
-        for coeff in dat:
-            lhs = coeff * self.y * ufl.dx
-            problem = LinearProblem(a=self.z * self.y * ufl.dx, L=lhs)
-            func = problem.solve()
-            datlist.append(func.x.array.reshape(-1,1))
-        
-        retlist.append(np.array(datlist))
-
-        bcs_ind = self.bcs[0].dof_indices()[0]
-        retlist.append(self.Wh.tabulate_dof_coordinates()[bcs_ind,:self.domain.topology.dim])
-
-        try:
-            retlist.append(self.bcs[0].g.x.array[bcs_ind].reshape(-1,1))
-        except:
-            val = self.bcs[0].g.value
-            arr = val*np.ones(bcs_ind.size)
-            retlist.append(arr.reshape(-1,1))
-        
-        return retlist
 
 
     def include_local_facet_loss(self):
