@@ -2,17 +2,18 @@ import ufl
 from dolfinx import fem
 from mpi4py import MPI
 
-def reaction_lim(Wh, b, c):
+def reaction_lim(domain, b, c):
+    Ch = fem.functionspace(domain, ('DG', 0))
     if isinstance(c, ufl.Constant):
         if c.value == 0:
             return
-    c_fun = fem.Function(Wh)
-    cbound_fun = fem.Function(Wh)
+    c_fun = fem.Function(Ch)
+    cbound_fun = fem.Function(Ch)
     exp = c - ufl.div(b)/2
     
-    c_exp = fem.Expression(c, Wh.element.interpolation_points())
+    c_exp = fem.Expression(c, Ch.element.interpolation_points())
 
-    cbound_exp = fem.Expression(exp, Wh.element.interpolation_points()
+    cbound_exp = fem.Expression(exp, Ch.element.interpolation_points()
                                 )
     c_fun.interpolate(c_exp)
     cbound_fun.interpolate(cbound_exp)
