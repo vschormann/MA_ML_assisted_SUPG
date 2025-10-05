@@ -5,6 +5,8 @@ from dolfinx.fem.petsc import LinearProblem
 import numpy as np
 from dolfinx import mesh as msh
 from supg.param_limit import param_limit
+from supg.param_heuristic import param_heuristic
+from supg.lagrange_deg import lagrange_deg
 
 class data:
     def __init__(self, domain, Wh, eps, b, c, f, bcs, boundary_eval=True):
@@ -19,7 +21,8 @@ class data:
 
         #FEM space for the SUPG-parameters/weights
         self.Yh = functionspace(domain, ("DG", 0))
-        self.yh = fem.Function(self.Yh)
+        #self.yh = fem.Function(self.Yh)
+        self.yh = param_heuristic(self.Wh, eps, b, self.Yh)
         self.y = ufl.TestFunction(self.Yh)
         self.z = ufl.TrialFunction(self.Yh)
         self.Yh_num_loc_dofs = self.yh.x.index_map.size_local
