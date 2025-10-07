@@ -10,7 +10,7 @@ from supg import supg
 from supg.plotter import fem_plotter_grid
 
 #domain
-domain = msh.create_unit_square(MPI.COMM_WORLD, 10, 10, msh.CellType.quadrilateral)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 20, 20, msh.CellType.quadrilateral)
 domain.topology.create_connectivity(domain.topology.dim - 1, domain.topology.dim)
 boundary_facets = msh.exterior_facet_indices(domain.topology)
 

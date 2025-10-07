@@ -34,35 +34,26 @@ class data:
         L = f * self.v * ufl.dx
         rh = f * self.yh * ufl.dot(b, ufl.grad(self.v)) * ufl.dx
 
-        Rh = ufl.replace(a+sh - L-rh, {self.u:self.w})
+        self.Rh = ufl.replace(a+sh - L-rh, {self.u:self.w})
 
         self.uh = fem.Function(self.Wh)
         self.prblm = LinearProblem(a=a + sh, L=L+rh, bcs=bcs, u=self.uh)
         
         self.prblm.solve()
 
-        #creates meshtags object and measure that ignores the boundary cells if boundary_eval is set to True. Can/should be changed to custom marker later?
-        all_cells = np.arange(domain.topology.index_map(domain.topology.dim).size_global, dtype=np.int32)
+        cids = np.arange(domain.topology.index_map(domain.topology.dim).size_local, dtype=np.int32)
+        marker = np.ones(cids.size, dtype=np.int32)
+        cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, cids, marker)
+        dx = ufl.Measure("dx", domain = domain, subdomain_data=cell_tag, subdomain_id=1)
 
 
-        self.marker = np.ones(all_cells.size, dtype=np.int32)
-
-        if boundary_eval:
-            self.dx = ufl.Measure("dx", domain = domain)
-        else:
-            for index in all_cells:
-                if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size == 0:
-                    self.marker[index] = 0
-            cell_tag = msh.meshtags(domain, domain.topology.dim, np.arange(all_cells.size, dtype=np.int32), self.marker)
-            self.dx = ufl.Measure("dx", domain = domain, subdomain_data = cell_tag, subdomain_id = 0)
-
-        self.residual = (-eps*ufl.div(ufl.grad(self.w)) + ufl.dot(b, ufl.grad(self.w)) + c * self.w - f)**2 * self.dx
+        self.residual = (-eps*ufl.div(ufl.grad(self.w)) + ufl.dot(b, ufl.grad(self.w)) + c * self.w - f)**2 * dx
 
  
         b_perp = ufl.conditional(ufl.eq(ufl.inner(b, b),0), b, -ufl.perp(b)/ufl.sqrt(ufl.inner(b,b)))
 
         cross = ufl.max_value(ufl.dot(b_perp, ufl.grad(self.w)), -ufl.dot(b_perp, ufl.grad(self.w)))
-        self.crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * self.dx
+        self.crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
 
 
         # Jump-term over the facets is negligible when using gradient descend and derived methods.
@@ -72,20 +63,29 @@ class data:
 
         self.loss = self.residual + self.crosswind_loss
 
+        if boundary_eval:
+            pass
+        else:
+            marker = []
+            for index in cids:
+                if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size == 0:
+                    marker.append(index)
+            self.set_cintegration_domain(marker)
+            
         hom_bcs = [fem.dirichletbc(fem.Constant(self.domain, default_scalar_type(0.0)), bcs[0].dof_indices()[0], self.Wh)]
         cvol = fem.assemble_vector(fem.form(self.y * ufl.dx)).array
         vol_fn = fem.Function(self.Yh)
         vol_fn.x.array[:len(cvol)] = 1/cvol
         vol_fn.x.scatter_forward()
 
-        Rh_w = ufl.derivative(form=Rh, coefficient=self.w, argument=self.u)
+        Rh_w = ufl.derivative(form=self.Rh, coefficient=self.w, argument=self.u)
         D_Ih = ufl.replace(ufl.derivative(form=self.loss, coefficient=self.w, argument=self.v), {self.w:self.uh})
         self.psi = fem.Function(self.Wh)
         self.adj_prblm = LinearProblem(a=ufl.adjoint(Rh_w), L=D_Ih, bcs=hom_bcs, u=self.psi)
         self.adj_prblm.solve()
 
         self.grd_fn = fem.Function(self.Yh)
-        Rh_y = ufl.replace(ufl.derivative(form=Rh, coefficient=self.yh, argument=self.y), {self.w:self.uh, self.v:self.psi})
+        Rh_y = ufl.replace(ufl.derivative(form=self.Rh, coefficient=self.yh, argument=self.y), {self.w:self.uh, self.v:self.psi})
         self.grd_prblm = LinearProblem(a=self.y * vol_fn * self.z * ufl.dx, L=-Rh_y, bcs=[], u=self.grd_fn)
         self.grd_prblm.solve()
 
@@ -128,9 +128,27 @@ class data:
 
 
     def constrained_grad(self):
-        
-        return self.grd_fn.x.array
+        self.grd_prblm.solve()
+        return self.grd_fn.x.array[:self.Yh_num_loc_dofs]
+    
 
+    def set_cintegration_domain(self, marker_ids):
+        marker = np.ones_like(marker_ids, dtype=np.int32)
+        cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, marker_ids, marker)
+        form = []
+        for integral in self.loss.integrals():
+            if integral.integral_type() == 'cell':
+                form.append(integral.reconstruct(subdomain_data=cell_tag))
+            else:
+                form.append(integral)
+        self.loss = ufl.form.Form(form)
+        
+        D_Ih = ufl.replace(ufl.derivative(form=self.loss, coefficient=self.w, argument=self.v), {self.w:self.uh})
+        lhs = self.adj_prblm.a
+        hom_bcs = self.adj_prblm.bcs
+        self.adj_prblm = LinearProblem(a=lhs, L=D_Ih, bcs=hom_bcs, u=self.psi)
+
+        self.adj_prblm.solve()
 
 
 
