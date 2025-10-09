@@ -41,49 +41,49 @@ class data:
         
         self.prblm.solve()
 
-        cids = np.arange(domain.topology.index_map(domain.topology.dim).size_local, dtype=np.int32)
+        #initially all cells are included in the loss term and a measure that can be altered with the set_cintegration and remove_DBC_evaluation functions
+        cids = np.arange(self.domain.topology.index_map(self.domain.topology.dim).size_local, dtype=np.int32)
         marker = np.ones(cids.size, dtype=np.int32)
         cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, cids, marker)
-        dx = ufl.Measure("dx", domain = domain, subdomain_data=cell_tag, subdomain_id=1)
+        dx = ufl.Measure("dx", domain = self.domain, subdomain_data=cell_tag, subdomain_id=1)
 
-
-        self.residual = (-eps*ufl.div(ufl.grad(self.w)) + ufl.dot(b, ufl.grad(self.w)) + c * self.w - f)**2 * dx
-
+        #loss term is composed of a residual and the crosswind term
+        residual = (-eps*ufl.div(ufl.grad(self.w)) + ufl.dot(b, ufl.grad(self.w)) + c * self.w - f)**2 * dx
  
         b_perp = ufl.conditional(ufl.eq(ufl.inner(b, b),0), b, -ufl.perp(b)/ufl.sqrt(ufl.inner(b,b)))
-
         cross = ufl.max_value(ufl.dot(b_perp, ufl.grad(self.w)), -ufl.dot(b_perp, ufl.grad(self.w)))
-        self.crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
+        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
 
 
         # Jump-term over the facets is negligible when using gradient descend and derived methods.
         #n = ufl.FacetNormal(self.domain)
         #alpha_E = ufl.avg(ufl.CellDiameter(self.domain)) / ufl.sqrt(eps)
-        self.facet_loss = ufl.jump(ufl.grad(self.w), b_perp)**2 *  ufl.dS
+        #self.facet_loss = ufl.jump(ufl.grad(self.w), b_perp)**2 *  ufl.dS
 
-        self.loss = self.residual + self.crosswind_loss
-
+        self.loss = residual + crosswind_loss
         if boundary_eval:
             pass
         else:
-            marker = []
-            for index in cids:
-                if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size == 0:
-                    marker.append(index)
-            self.set_cintegration_domain(marker)
-            
+            self.remove_DBC_evaluation()
+        
+        #the adjoint problem needs homgenous boundary conditions.
         hom_bcs = [fem.dirichletbc(fem.Constant(self.domain, default_scalar_type(0.0)), bcs[0].dof_indices()[0], self.Wh)]
-        cvol = fem.assemble_vector(fem.form(self.y * ufl.dx)).array
-        vol_fn = fem.Function(self.Yh)
-        vol_fn.x.array[:len(cvol)] = 1/cvol
-        vol_fn.x.scatter_forward()
 
+        #definition of the adjoint problem
         Rh_w = ufl.derivative(form=self.Rh, coefficient=self.w, argument=self.u)
         D_Ih = ufl.replace(ufl.derivative(form=self.loss, coefficient=self.w, argument=self.v), {self.w:self.uh})
         self.psi = fem.Function(self.Wh)
         self.adj_prblm = LinearProblem(a=ufl.adjoint(Rh_w), L=D_Ih, bcs=hom_bcs, u=self.psi)
         self.adj_prblm.solve()
 
+        
+        #volume of the cells needs to be factored out for gradient computation
+        cvol = fem.assemble_vector(fem.form(self.y * ufl.dx)).array
+        vol_fn = fem.Function(self.Yh)
+        vol_fn.x.array[:len(cvol)] = 1/cvol
+        vol_fn.x.scatter_forward()
+
+        #gradient problem
         self.grd_fn = fem.Function(self.Yh)
         Rh_y = ufl.replace(ufl.derivative(form=self.Rh, coefficient=self.yh, argument=self.y), {self.w:self.uh, self.v:self.psi})
         self.grd_prblm = LinearProblem(a=self.y * vol_fn * self.z * ufl.dx, L=-Rh_y, bcs=[], u=self.grd_fn)
@@ -112,7 +112,7 @@ class data:
         frm = ufl.replace(loss, {self.w:self.uh})
         return fem.assemble_scalar(fem.form(frm))
     
-    def local_loss(self, loss=None, itype='cell'):
+    def local_loss(self, loss=None):
         if loss == None:
             loss = self.loss
 
@@ -126,11 +126,9 @@ class data:
         retfun.x.scatter_forward()
         return retfun
 
-
     def constrained_grad(self):
         self.grd_prblm.solve()
         return self.grd_fn.x.array[:self.Yh_num_loc_dofs]
-    
 
     def set_cintegration_domain(self, marker_ids):
         marker = np.ones_like(marker_ids, dtype=np.int32)
@@ -147,8 +145,17 @@ class data:
         lhs = self.adj_prblm.a
         hom_bcs = self.adj_prblm.bcs
         self.adj_prblm = LinearProblem(a=lhs, L=D_Ih, bcs=hom_bcs, u=self.psi)
-
         self.adj_prblm.solve()
+        
+        self.grd_prblm.b.assemble()
+        self.grd_prblm.solve()
+
+    def remove_DBC_evaluation(self):
+        marker = self.loss.integrals_by_type('cell')[0].subdomain_data().indices
+        for index in marker:
+            if np.intersect1d(self.Wh.dofmap.cell_dofs(index), self.prblm.bcs[0].dof_indices()[0]).size > 0:
+                marker = marker[marker!=index]
+        self.set_cintegration_domain(marker)
 
 
 

@@ -29,7 +29,7 @@ dx = ufl.Measure("dx", domain = domain, subdomain_data = cell_tag, subdomain_id 
 exp = yh*dx
 start = time.perf_counter()
 for i in range(iterations):
-    batch = np.random.randint(low=0, high=all_cells.size, size=size, dtype=np.int32)
+    batch = np.random.choice(all_cells, size=size, replace=False)
     marker = np.ones_like(batch)
     cell_tag = mesh.meshtags(domain, domain.topology.dim, batch, marker)
     form = []
