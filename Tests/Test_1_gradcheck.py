@@ -1,11 +1,13 @@
-from supg.sp_problems import dat1 as dat
+from supg.sp_problems import pde_data1 as pde_data
 from torch_classes.supg_torch import supg_loss
 import torch
 from supg import supg
 import numpy as np
+import dolfinx.mesh as msh
+import mpi4py.MPI as MPI
 
-
-sd = supg.data(*dat, False)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=True)
 dtype = torch.double
 device = torch.device('cpu')
 

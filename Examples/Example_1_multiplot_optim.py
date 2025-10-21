@@ -1,11 +1,17 @@
 #from __future__ import annotations
 
 import pyvista as pv
-from supg.sp_problems import dat1 as dat, stg
+from supg.sp_problems import pde_data1 as pde_data
 from supg import supg
+from dolfinx import mesh as msh
+from mpi4py import MPI
 
-sd = supg.data(*dat, False)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
 sd.set_weights(1e-1)
+stg = sd.create_stage()
+
 weights = sd.yh.x.array
 
 learning_rate = 1e-3

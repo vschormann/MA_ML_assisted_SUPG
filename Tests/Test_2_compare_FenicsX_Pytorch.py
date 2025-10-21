@@ -1,13 +1,15 @@
-from supg.sp_problems import dat1
+from supg.sp_problems import pde_data1 as pde_data
 from supg import supg
 from torch_classes.supg_torch import supg_loss
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch_classes.nn_models as nn_models
+import dolfinx.mesh as msh
+import mpi4py.MPI as MPI
 
-
-sd = supg.data(*dat1, False)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=True)
 
 sd.set_weights(1e-1)
 model = nn_models.md1(torch.Tensor(sd.yh.x.array).view(1,-1))

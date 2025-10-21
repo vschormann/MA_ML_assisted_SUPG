@@ -1,14 +1,19 @@
-from supg.sp_problems import dat1, stg
+from supg.sp_problems import pde_data1 as pde_data
 from torch_classes.nn_models import md1
 from torch_classes.supg_torch import supg_loss
 import torch
 import pyvista as pv
 from supg import supg
-
+import dolfinx.mesh as msh
+import mpi4py.MPI as MPI
 device = torch.device("mps")
 
-sd = supg.data(*dat1, boundary_eval=False)
-comp_sd = supg.data(*dat1, boundary_eval=True)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
+sd.set_weights(1e-1)
+stg = sd.create_stage()
+comp_sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=True)
 
 sd.set_weights(1e-1)
 comp_sd.set_weights(1e-1)

@@ -1,15 +1,21 @@
-from supg.sp_problems import dat1, stg
+from supg.sp_problems import pde_data1 as pde_data
 from supg import supg
 import pyvista as pv
 import ufl
 from dolfinx import fem
+from mpi4py import MPI
+import dolfinx.mesh as msh
 
-sd = supg.data(*dat1)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
+
+stg = sd.create_stage()
 
 domain = sd.domain
-eps = sd.eps
-Wh = sd.Wh
-x = ufl.SpatialCoordinate(sd.domain)
+Wh = pde_data(domain)[0]
+eps = pde_data(domain)[1]
+x = ufl.SpatialCoordinate(domain)
 
 ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - (((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps)))- ufl.exp(-(1)/eps))/(1-ufl.exp(-1/eps)))
 
@@ -34,15 +40,15 @@ p.add_text('Galerkin approximation (weights = 0)')
 grid = stg.grid.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
-sd.set_weights(0.025)
+sd.set_weights(0.07)
 p.subplot(1,0)
-p.add_text('SUPG approximation with weights = 0.025')
+p.add_text('SUPG approximation with weights = 0.07')
 grid = stg.grid.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
-sd.set_weights(0.1)
+sd.set_weights(0.3)
 p.subplot(1,1)
-p.add_text('SUPG approximation with weights = 0.1')
+p.add_text('SUPG approximation with weights = 0.3')
 grid = stg.grid.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 

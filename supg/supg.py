@@ -6,46 +6,44 @@ import numpy as np
 from dolfinx import mesh as msh
 from supg.param_limit import param_limit
 from supg.param_heuristic import param_heuristic
-from supg.lagrange_deg import lagrange_deg
+from supg.plotter import fem_plotter_grid
 
 class data:
-    def __init__(self, domain, Wh, eps, b, c, f, bcs, boundary_eval=True):
+    def __init__(self, domain, pde_data, boundary_eval=True):
         #data for FEM-solution-space
+        self.pde_data = pde_data
         self.domain = domain
-
-        self.Wh = Wh
-        self.u = ufl.TrialFunction(Wh)
+        Wh,eps,b,c,f,bcs,g = pde_data(domain)
+        u = ufl.TrialFunction(Wh)
         self.v = ufl.TestFunction(Wh)
         self.w = ufl.Coefficient(Wh)
         self.p_limit = param_limit(Wh, eps, b, c)
+        dx = ufl.Measure("dx", domain = self.domain)
 
         #FEM space for the SUPG-parameters/weights
         self.Yh = functionspace(domain, ("DG", 0))
-        #self.yh = fem.Function(self.Yh)
-        self.yh = param_heuristic(self.Wh, eps, b, self.Yh)
+        self.yh = param_heuristic(Wh, eps, b, self.Yh)
         self.y = ufl.TestFunction(self.Yh)
-        self.z = ufl.TrialFunction(self.Yh)
+        z = ufl.TrialFunction(self.Yh)
+
+        #number of locally owned cells
         self.Yh_num_loc_dofs = self.yh.x.index_map.size_local
 
         #SUPG-forms
-        a = (eps * ufl.dot(ufl.grad(self.u), ufl.grad(self.v)) + ufl.dot(b, ufl.grad(self.u)) * self.v + c * self.u * self.v) * ufl.dx
-        sh = (-eps * ufl.div(ufl.grad(self.u)) + ufl.dot(b, ufl.grad(self.u)) + c * self.u) * (self.yh * ufl.dot(b, ufl.grad(self.v))) * ufl.dx
+        a = (eps * ufl.dot(ufl.grad(u), ufl.grad(self.v)) + ufl.dot(b, ufl.grad(u)) * self.v + c * u * self.v) * dx
+        sh = (-eps * ufl.div(ufl.grad(u)) + ufl.dot(b, ufl.grad(u)) + c * u) * (self.yh * ufl.dot(b, ufl.grad(self.v))) * dx
 
-        L = f * self.v * ufl.dx
-        rh = f * self.yh * ufl.dot(b, ufl.grad(self.v)) * ufl.dx
+        L = f * self.v * dx
+        if g is not None:
+            L += g * self.v * ufl.ds
+        rh = f * self.yh * ufl.dot(b, ufl.grad(self.v)) * dx
 
-        self.Rh = ufl.replace(a+sh - L-rh, {self.u:self.w})
+        self.Rh = ufl.replace(a+sh - L-rh, {u:self.w})
 
-        self.uh = fem.Function(self.Wh)
+        self.uh = fem.Function(Wh)
         self.prblm = LinearProblem(a=a + sh, L=L+rh, bcs=bcs, u=self.uh)
         
         self.prblm.solve()
-
-        #initially all cells are included in the loss term and a measure that can be altered with the set_cintegration and remove_DBC_evaluation functions
-        cids = np.arange(self.domain.topology.index_map(self.domain.topology.dim).size_local, dtype=np.int32)
-        marker = np.ones(cids.size, dtype=np.int32)
-        cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, cids, marker)
-        dx = ufl.Measure("dx", domain = self.domain, subdomain_data=cell_tag, subdomain_id=1)
 
         #loss term is composed of a residual and the crosswind term
         residual = (-eps*ufl.div(ufl.grad(self.w)) + ufl.dot(b, ufl.grad(self.w)) + c * self.w - f)**2 * dx
@@ -61,24 +59,20 @@ class data:
         #self.facet_loss = ufl.jump(ufl.grad(self.w), b_perp)**2 *  ufl.dS
 
         self.loss = residual + crosswind_loss
-        if boundary_eval:
-            pass
-        else:
-            self.remove_DBC_evaluation()
         
         #the adjoint problem needs homgenous boundary conditions.
-        hom_bcs = [fem.dirichletbc(fem.Constant(self.domain, default_scalar_type(0.0)), bcs[0].dof_indices()[0], self.Wh)]
+        hom_bcs = [fem.dirichletbc(fem.Constant(self.domain, default_scalar_type(0.0)), bcs[0].dof_indices()[0], Wh)]
 
         #definition of the adjoint problem
-        Rh_w = ufl.derivative(form=self.Rh, coefficient=self.w, argument=self.u)
+        Rh_w = ufl.derivative(form=self.Rh, coefficient=self.w, argument=u)
         D_Ih = ufl.replace(ufl.derivative(form=self.loss, coefficient=self.w, argument=self.v), {self.w:self.uh})
-        self.psi = fem.Function(self.Wh)
+        self.psi = fem.Function(Wh)
         self.adj_prblm = LinearProblem(a=ufl.adjoint(Rh_w), L=D_Ih, bcs=hom_bcs, u=self.psi)
         self.adj_prblm.solve()
 
         
         #volume of the cells needs to be factored out for gradient computation
-        cvol = fem.assemble_vector(fem.form(self.y * ufl.dx)).array
+        cvol = fem.assemble_vector(fem.form(self.y * dx)).array
         vol_fn = fem.Function(self.Yh)
         vol_fn.x.array[:len(cvol)] = 1/cvol
         vol_fn.x.scatter_forward()
@@ -86,8 +80,13 @@ class data:
         #gradient problem
         self.grd_fn = fem.Function(self.Yh)
         Rh_y = ufl.replace(ufl.derivative(form=self.Rh, coefficient=self.yh, argument=self.y), {self.w:self.uh, self.v:self.psi})
-        self.grd_prblm = LinearProblem(a=self.y * vol_fn * self.z * ufl.dx, L=-Rh_y, bcs=[], u=self.grd_fn)
+        self.grd_prblm = LinearProblem(a=self.y * vol_fn * z * dx, L=-Rh_y, bcs=[], u=self.grd_fn)
         self.grd_prblm.solve()
+
+        if boundary_eval:
+            pass
+        else:
+            self.remove_DBC_evaluation()
 
     def set_weights(self, weights):
         if isinstance(weights, np.ndarray):
@@ -131,12 +130,15 @@ class data:
         return self.grd_fn.x.array[:self.Yh_num_loc_dofs]
 
     def set_cintegration_domain(self, marker_ids):
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, marker_ids, marker)
+        if isinstance(marker_ids, msh.MeshTags):
+            cell_tag = marker_ids
+        else:
+            marker = np.ones_like(marker_ids, dtype=np.int32)
+            cell_tag = msh.meshtags(self.domain, self.domain.topology.dim, marker_ids, marker)
         form = []
         for integral in self.loss.integrals():
             if integral.integral_type() == 'cell':
-                form.append(integral.reconstruct(subdomain_data=cell_tag))
+                form.append(integral.reconstruct(subdomain_data=cell_tag, subdomain_id=1))
             else:
                 form.append(integral)
         self.loss = ufl.form.Form(form)
@@ -151,11 +153,43 @@ class data:
         self.grd_prblm.solve()
 
     def remove_DBC_evaluation(self):
-        marker = self.loss.integrals_by_type('cell')[0].subdomain_data().indices
+        try:
+            marker = self.loss.integrals_by_type('cell')[0].subdomain_data().indices
+        except:
+            range = self.domain.topology.index_map(2).local_range
+            marker = np.arange(range[0], range[1])
         for index in marker:
-            if np.intersect1d(self.Wh.dofmap.cell_dofs(index), self.prblm.bcs[0].dof_indices()[0]).size > 0:
+            if np.intersect1d(self.uh.function_space.dofmap.cell_dofs(index), self.prblm.bcs[0].dof_indices()[0]).size > 0:
                 marker = marker[marker!=index]
         self.set_cintegration_domain(marker)
+
+    def alter_triangulation(self, domain, boundary_eval=True, cell_tag=None):
+        self.__init__(domain, self.pde_data, boundary_eval)
+        if cell_tag is not None:
+            self.set_cintegration_domain(cell_tag)
+            
+
+    #This function only works for triangular grids as refinement is not implemented in FEniCSx for quadrilateral grids
+    def refine_grid(self, loss=None, threshold=90):
+        cell_tag = self.loss.integrals_by_type('cell')[0].subdomain_data()
+        #parent_cells = cell_tag.indices
+        if str(self.domain.ufl_cell())!='triangle':
+            print('automatic grid refinement is only implemented for triangles')
+            return
+        loss = self.local_loss(loss).x.array
+        args = np.argwhere(loss>np.percentile(loss, threshold))
+        list = np.array([])
+        for arg in args:
+            list = np.append(list, self.domain.topology.connectivity(2,1).links(arg)[0])
+        refined_domain, parent_cells, _ = msh.refine(self.domain, list, option=msh.RefinementOption.parent_cell)
+        if cell_tag is not None:
+            refined_cell_tag = msh.transfer_meshtag(cell_tag, refined_domain, parent_cell=parent_cells)
+            self.alter_triangulation(refined_domain, cell_tag=refined_cell_tag)
+        else:
+            self.alter_triangulation(refined_domain, cell_tag=None)
+
+    def create_stage(self):
+        return fem_plotter_grid(self.uh.function_space)
 
 
 

@@ -1,19 +1,20 @@
-from supg.sp_problems import dat1
+from supg.sp_problems import pde_data1 as pde_data
 from supg import supg
 from torch_classes.supg_torch import supg_loss
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch_classes.nn_models as nn_models
+import dolfinx.mesh as msh
+import mpi4py.MPI as MPI
 
 
-
-
+domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
 learning_rate = 1e-4
 
 
 loss_array = np.array([])
-sd = supg.data(*dat1, False)
+sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
 sd.set_weights(1e-1)
 model = nn_models.md1(torch.Tensor(sd.yh.x.array).view(1,-1))
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
@@ -28,7 +29,7 @@ for t in range(1000):
 
 
 comp_loss_array = np.array([])
-comp_sd = supg.data(*dat1, False)
+comp_sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
 comp_sd.set_weights(1e-1)
 comp_model = nn_models.md1(torch.Tensor(comp_sd.yh.x.array).view(1,-1))
 comp_optimizer = torch.optim.Adam(comp_model.parameters(), lr=learning_rate)
