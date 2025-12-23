@@ -31,10 +31,11 @@ def pde_data2(domain):
     b = ufl.as_vector((fem.Constant(domain, default_scalar_type(2.0)),fem.Constant(domain, default_scalar_type(3.0))))
     c = fem.Constant(domain, default_scalar_type(1.0))
     expr = x[0]*x[1]**2 - x[1]**2*ufl.exp(2*(x[0]-1)/(eps)) - x[0]*ufl.exp(3*(x[1]-1)/eps) + ufl.exp((2*(x[0]-1)+3*(x[1]-1))/eps)
-    f = -eps * ufl.div(ufl.grad(expr)) + ufl.dot(b,ufl.grad(expr)) + c*expr
+    #f = -eps * ufl.div(ufl.grad(expr)) + ufl.dot(b,ufl.grad(expr)) + c*expr
     u_exact = fem.Expression(expr, Wh.element.interpolation_points())
     uD = fem.Function(Wh)
     uD.interpolate(u_exact)
+    f = -eps * ufl.div(ufl.grad(uD)) + ufl.dot(b,ufl.grad(uD)) + c*uD
     bcs = [fem.dirichletbc(uD, boundary_dofs)]
     return Wh,eps,b,c,f,bcs,None
 
@@ -50,9 +51,10 @@ def pde_data3(domain):
     b = ufl.as_vector((fem.Constant(domain, default_scalar_type(2.0)),fem.Constant(domain, default_scalar_type(3.0))))
     c = fem.Constant(domain, default_scalar_type(0.0))
     expr = 16*x[0]*(1-x[0])*x[1]*(1-x[1])*(1/2+ufl.atan(2*eps**(-1/2)*(0.25**2-(x[0]-0.5)**2-(x[1]-1/2)**2))/ufl.pi)
-    f = -eps * expr.dx(i).dx(i) + b[i]*expr.dx(i) + c*expr
+    #f = -eps * expr.dx(i).dx(i) + b[i]*expr.dx(i) + c*expr
     u_exact = fem.Expression(expr, Wh.element.interpolation_points())
     uD = fem.Function(Wh)
+    f = -eps * uD.dx(i).dx(i) + b[i]*uD.dx(i) + c*uD
     uD.interpolate(u_exact)
     bcs = [fem.dirichletbc(uD, boundary_dofs)]
     return Wh, eps, b,c,f,bcs,None

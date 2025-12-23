@@ -6,7 +6,7 @@ from dolfinx import fem
 from mpi4py import MPI
 import dolfinx.mesh as msh
 
-domain = msh.create_unit_square(MPI.COMM_WORLD, 16, 16, msh.CellType.triangle)
+domain = msh.create_unit_square(MPI.COMM_WORLD, 10, 10, msh.CellType.quadrilateral)
 
 sd = supg.data(domain=domain, pde_data=pde_data, boundary_eval=False)
 
@@ -28,28 +28,30 @@ p = pv.Plotter(shape=(2,2))
 
 stg.add_data(u_ex)
 p.subplot(0,0)
-p.add_text('analytic solution')
-grid = stg.grid.reflect((1,0,0))
+p.add_text('analytical solution')
+grid = stg.grid#.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
 
-stg.add_data(sd.uh)
 sd.set_weights(0)
+stg.add_data(sd.uh)
 p.subplot(0,1)
 p.add_text('Galerkin approximation (weights = 0)')
-grid = stg.grid.reflect((1,0,0))
+grid = stg.grid#.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
 sd.set_weights(0.07)
+stg.add_data(sd.uh)
 p.subplot(1,0)
 p.add_text('SUPG approximation with weights = 0.07')
-grid = stg.grid.reflect((1,0,0))
+grid = stg.grid#.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
 sd.set_weights(0.3)
+stg.add_data(sd.uh)
 p.subplot(1,1)
 p.add_text('SUPG approximation with weights = 0.3')
-grid = stg.grid.reflect((1,0,0))
+grid = stg.grid#.reflect((1,0,0))
 p.add_mesh(grid.warp_by_scalar(), show_edges=True)
 
 p.remove_scalar_bar()

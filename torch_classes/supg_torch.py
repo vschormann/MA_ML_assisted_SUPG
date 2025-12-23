@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 
 class supg_func_torch(torch.autograd.Function):
     @staticmethod
