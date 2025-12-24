@@ -79,7 +79,7 @@ train(
          device=input.device,
          epochs=20,
          train_loss_file='data/example_2_1/exact_train_loss_SGD.npy',
-         test_loss_file='data/example_2_1/exact_testloss_SGD.npy'
+         test_loss_file='data/example_2_1/exact_test_loss_SGD.npy'
          )
 
 t1 = time.perf_counter() - start
@@ -94,7 +94,7 @@ train(
          device=input.device,
          epochs=20,
          train_loss_file='data/example_2_1/exact_train_loss_Adam.npy',
-         test_loss_file='data/example_2_1/exact_testloss_Adam.npy'
+         test_loss_file='data/example_2_1/exact_test_loss_Adam.npy'
          )
 
 t1 = time.perf_counter() - start

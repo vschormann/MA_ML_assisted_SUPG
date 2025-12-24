@@ -1,18 +1,13 @@
-import os
-import numpy as np
-from dolfinx import io
-from dolfinx import fem
-from dolfinx import default_scalar_type
-from dolfinx import mesh as msh
+from IPython.display import clear_output
+from dolfinx import io, fem, mesh as msh, default_scalar_type
 import ufl
 import torch
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
+import os
 from mpi4py import MPI
-
-from example_2_1_model import model
+import numpy as np
 from utils.FEniCSx_solver import FEniCSx_solver
 from utils.FEniCSx_PyTorch_interface import FEniCSx_PyTorch_interface
+from example_2_1_model import model
 
 model_init='data/example_2_1/models/nn_init.pth'
 
@@ -20,15 +15,14 @@ nn= model(device='cpu', dtype=torch.float64, dir=model_init)
 w = nn.state_dict()['w'].detach().numpy()
 
 
-class Dataset_section_2_3_1(Dataset):
-    def __init__(self, mesh_dir):
-        self.mesh_dir = mesh_dir
-
-    def __len__(self):
-        return int(len(sorted(os.listdir(self.mesh_dir)))/2)
-
-    def __getitem__(self, idx):
-        mesh_path = os.path.join(self.mesh_dir, f"mesh_{idx}.xdmf")
+data = [["data/example_2_1/test_set/fem_data/", 'data/example_2_1/test_set/target_values/t'], ["data/example_2_1/training_set/fem_data/", 'data/example_2_1/training_set/target_values/t']]
+iterations = 500
+for [mesh_dir, dir] in data:
+    train_loss = 0
+    lst = os.listdir(mesh_dir)
+    size = len([f for f in lst if f.endswith('.xdmf')])
+    for idx in range(size):
+        mesh_path = os.path.join(mesh_dir, f"mesh_{idx}.xdmf")
         with io.XDMFFile(MPI.COMM_WORLD, mesh_path, "r") as reader:
             mesh = reader.read_mesh()
 
@@ -45,7 +39,7 @@ class Dataset_section_2_3_1(Dataset):
         uh = fem.Function(Wh)
 
         x = ufl.SpatialCoordinate(mesh)
-        ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - ((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps))- ufl.exp(-(1)/eps))/(1-ufl.exp(-1/eps)))
+        ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - (((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps)))- ufl.exp(-(1)/eps))/(1-ufl.exp(-1/eps)))
 
 
         exp = fem.Expression(ex_exp, Wh.element.interpolation_points())
@@ -72,15 +66,24 @@ class Dataset_section_2_3_1(Dataset):
         FEniCSx.set_weights(supg_params)
         params = torch.tensor(supg_params, requires_grad=True)
         autograd_func = FEniCSx_PyTorch_interface.apply
+        
         def fem_solver(weights):
             return autograd_func(weights, FEniCSx)
+        
+        optimizer = torch.optim.Adam([params])
+        train_loss = 0
+        for steps in range(iterations):
+            optimizer.zero_grad()
+            loss = fem_solver(params)
+            loss.backward()
+            # Backpropagation
+            optimizer.step()
 
-        return {'params':params, 'fem_solver':fem_solver}
-    
-    
-def collate_fn(batch):
-    fem_solver  = [b['fem_solver'] for b in batch]
-    params = [b['params'] for b in batch]
-    return params, fem_solver
-
-train_dataset = Dataset_section_2_3_1(mesh_dir="data/example_2_1/training_set/fem_data/")
+        train_loss += loss
+        target = params
+        torch.save(target, f'{dir}_{idx}.pt')
+        clear_output(wait=True)
+        print(f"Current datapoint: {idx} \n")
+        print(f"loss: {loss}")
+    train_loss /= size
+    print(f"train_loss: {train_loss:>7f}")

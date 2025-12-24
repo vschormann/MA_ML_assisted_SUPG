@@ -71,4 +71,4 @@ train_dataset = Dataset_example_2_1(input_dir="data/example_2_1/training_set/inp
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
 test_dataset = Dataset_example_2_1(input_dir="data/example_2_1/test_set/inputs/", mesh_dir="data/example_2_1/test_set/fem_data/")
-test_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
