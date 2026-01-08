@@ -3,6 +3,5 @@
 *.gif
 __pycache__
 .DS_Store
-*.ipynb
 *.png
 /data

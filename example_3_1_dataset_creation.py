@@ -95,20 +95,20 @@ def mesh_to_x(mesh, cell_ind_to_grid, epsK, bK, cK, fK, non_perturbed=False, dev
             x[12,:,0] = (x[0,:,0] + x[2,:,0])/2
             x[12,:,-1] = (x[0,:,-1] + x[2,:,-1])/2
         if np.all(bK == np.array([-1,0])):
-            x[12,0,:] = -(x[0,0,:] + x[2,0,:])/2
-            x[12,-1,:] = -(x[0,-1,:] + x[2,-1,:])/2
-            x[12,:,0] = -(x[0,:,0] + x[2,:,0])/2
-            x[12,:,-1] = -(x[0,:,-1] + x[2,:,-1])/2
+            x[12,0,:] = ((x[0,0,:] + x[2,0,:])/2).flip(0)
+            x[12,-1,:] = ((x[0,-1,:] + x[2,-1,:])/2).flip(0)
+            x[12,:,0] = ((x[0,:,0] + x[2,:,0])/2).flip(0)
+            x[12,:,-1] = ((x[0,:,-1] + x[2,:,-1])/2).flip(0)
         if np.all(bK == np.array([0,1])):
             x[12,0,:] = (x[1,0,:] + x[3,0,:])/2
             x[12,-1,:] = (x[1,-1,:] + x[3,-1,:])/2
             x[12,:,0] = (x[1,:,0] + x[3,:,0])/2
             x[12,:,-1] = (x[1,:,-1] + x[3,:,-1])/2
         if np.all(bK == np.array([0,-1])):
-            x[12,0,:] = -(x[1,0,:] + x[3,0,:])/2
-            x[12,-1,:] = -(x[1,-1,:] + x[3,-1,:])/2
-            x[12,:,0] = -(x[1,:,0] + x[3,:,0])/2
-            x[12,:,-1] = -(x[1,:,-1] + x[3,:,-1])/2
+            x[12,0,:] = ((x[1,0,:] + x[3,0,:])/2).flip(0)
+            x[12,-1,:] = ((x[1,-1,:] + x[3,-1,:])/2).flip(0)
+            x[12,:,0] = ((x[1,:,0] + x[3,:,0])/2).flip(0)
+            x[12,:,-1] = ((x[1,:,-1] + x[3,:,-1])/2).flip(0)
 
 
     return x
@@ -214,15 +214,15 @@ element = mesh.geometry.cmap
 mask= ~np.any((vertices[:,:2] == 0) | (vertices[:,:2] == 1), axis=1)
 for bK in [np.array([1,0]), np.array([-1,0]), np.array([0,1]), np.array([0,-1])]:
     for non_perturbed in [True, False]:
-        #with io.XDMFFile(mesh.comm, f"data/example_3_2/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
+        #with io.XDMFFile(mesh.comm, f"data/example_3_1/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
         #    writer.write_mesh(ms)
-        x = mesh_to_x(mesh=mesh, cell_ind_to_grid=cell_ind_to_grid,epsK=epsK, bK=bK, cK=cK, fK=fK)
-        torch.save(x, f'data/example_3_2/training_set/inputs/x_{num}.pt')
+        x = mesh_to_x(mesh=mesh, cell_ind_to_grid=cell_ind_to_grid,epsK=epsK, bK=bK, cK=cK, fK=fK,non_perturbed=non_perturbed)
+        torch.save(x, f'data/example_3_1/training_set/inputs/x_{num}.pt')
         t = create_target_values(mesh=mesh, bK=bK, non_perturbed=non_perturbed)
-        torch.save(t, f'data/example_3_2/training_set/target_values/t_{num}.pt')
+        torch.save(t, f'data/example_3_1/training_set/target_values/t_{num}.pt')
         num += 1
 
-for i in range(200):
+for i in range(50):
     for bK in [np.array([1,0]), np.array([-1,0]), np.array([0,1]), np.array([0,-1])]:
         for non_perturbed in [True, False]:
             noise = np.random.normal(mean, std, size=vertices.shape)
@@ -232,12 +232,12 @@ for i in range(200):
             new_vertices[mask] += noise[mask]
             ms = msh.create_mesh(comm=comm, cells=cells, x=new_vertices, e=mesh.ufl_domain())
             
-            #with io.XDMFFile(mesh.comm, f"data/example_3_2/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
+            #with io.XDMFFile(mesh.comm, f"data/example_3_1/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
             #    writer.write_mesh(ms)
-            x = mesh_to_x(mesh=ms, cell_ind_to_grid=cell_ind_to_grid,epsK=epsK, bK=bK, cK=cK, fK=fK)
-            torch.save(x, f'data/example_3_2/training_set/inputs/x_{num}.pt')
+            x = mesh_to_x(mesh=ms, cell_ind_to_grid=cell_ind_to_grid,epsK=epsK, bK=bK, cK=cK, fK=fK,non_perturbed=non_perturbed)
+            torch.save(x, f'data/example_3_1/training_set/inputs/x_{num}.pt')
             t = create_target_values(mesh=ms, bK=bK, non_perturbed=non_perturbed)
-            torch.save(t, f'data/example_3_2/training_set/target_values/t_{num}.pt')
+            torch.save(t, f'data/example_3_1/training_set/target_values/t_{num}.pt')
             num += 1
 
 
@@ -257,7 +257,7 @@ cells = mesh.geometry.dofmap
 
 element = mesh.geometry.cmap
 mask= ~np.any((vertices[:,:2] == 0) | (vertices[:,:2] == 1), axis=1)
-for i in range(50):
+for i in range(20):
     for bK in [np.array([1,0]), np.array([-1,0]), np.array([0,1]), np.array([0,-1])]:
         for non_perturbed in [True, False]:
             noise = np.random.normal(mean, std, size=vertices.shape)
@@ -266,10 +266,10 @@ for i in range(50):
 
             new_vertices[mask] += noise[mask]
             ms = msh.create_mesh(comm=comm, cells=cells, x=new_vertices, e=mesh.ufl_domain())
-            #with io.XDMFFile(mesh.comm, f"data/example_3_2/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
+            #with io.XDMFFile(mesh.comm, f"data/example_3_1/training_set/fem_data/mesh_{num}.xdmf", "w") as writer:
             #    writer.write_mesh(ms)
             x = mesh_to_x(mesh=ms, cell_ind_to_grid=cell_ind_to_grid,epsK=epsK, bK=bK, cK=cK, fK=fK)
-            torch.save(x, f'data/example_3_2/test_set/inputs/x_{num}.pt')
+            torch.save(x, f'data/example_3_1/test_set/inputs/x_{num}.pt')
             t = create_target_values(mesh=ms, bK=bK, non_perturbed=non_perturbed)
-            torch.save(t, f'data/example_3_2/test_set/target_values/t_{num}.pt')
+            torch.save(t, f'data/example_3_1/test_set/target_values/t_{num}.pt')
             num += 1
