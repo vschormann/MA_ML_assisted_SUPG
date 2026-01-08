@@ -3,7 +3,7 @@ from torch import nn
 
 from utils.supervised_dataset import supervised_dataset as dataset
 from torch.utils.data import DataLoader
-from utils.flattening_transform import flattening_transform, reindex_transform
+from utils.transforms import flattening_transform, reindex_transform
 
 def create_cell_ind_to_grid(H, W):
     w, h = torch.meshgrid(
