@@ -37,12 +37,15 @@ def create_flattening_index_set(H,W, continuous_traversal=False):
     return torch.argsort(diag_key.flatten())
 
 class flattening_transform:
-    def __init__(self, flat_key: torch.Tensor, C: int):
+    def __init__(self, flat_key: torch.Tensor, C: int, pseudo_channel=None):
         self.flat_key = flat_key
         self.C = C
+        self.pseudo_channel = pseudo_channel
 
     def __call__(self, x: torch.Tensor):
         x = x.reshape(self.C,-1)[:,self.flat_key]
+        if self.pseudo_channel:
+            return x.T.flatten().reshape(1,-1)
         return x.T.flatten()
     
 class channeled_flattening_transform:
