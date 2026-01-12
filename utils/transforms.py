@@ -36,6 +36,15 @@ def create_flattening_index_set(H,W, continuous_traversal=False):
 
     return torch.argsort(diag_key.flatten())
 
+def cells_from_flat_array_ind(H,W):
+    ctg = create_cell_ind_to_grid(H,W)
+    bctg = torch.concat((ctg[0,:],ctg[-1,:],ctg[:,0],ctg[:,-1])).unique()
+    combined = torch.cat((bctg, torch.arange(H*W)))
+
+    uniques, counts = combined.unique(return_counts=True)
+    difference = uniques[counts == 1]
+    return difference
+
 class flattening_transform:
     def __init__(self, flat_key: torch.Tensor, C: int, pseudo_channel=None):
         self.flat_key = flat_key
