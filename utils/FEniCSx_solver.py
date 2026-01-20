@@ -101,5 +101,6 @@ class FEniCSx_solver:
 
     def grad(self):
         return self.grd_fn.x.array[:self.owned_cells]
+    
 
 
