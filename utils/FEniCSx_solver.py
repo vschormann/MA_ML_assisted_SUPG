@@ -1,8 +1,35 @@
 import ufl
-from dolfinx import default_scalar_type, fem
+from dolfinx import default_scalar_type, fem, la
 from dolfinx.fem import functionspace
 from dolfinx.fem.petsc import LinearProblem
 import numpy as np
+import scipy
+
+class LinearSolver:
+    def __init__(self, a, L, uh, bcs):
+        self.a_compiled = fem.form(a)
+        self.L_compiled = fem.form(L)
+        self.A = fem.create_matrix(self.a_compiled)
+        self.b = fem.Function(uh.function_space)
+        self.bcs = bcs
+        self._A_scipy = self.A.to_scipy()
+        self.uh = uh
+
+    def solve(self):
+        self._A_scipy.data[:] = 0
+
+        fem.assemble_matrix(self.A, self.a_compiled, bcs=self.bcs)
+
+        self.b.x.array[:] = 0
+        fem.assemble_vector(self.b.x.array, self.L_compiled)
+        fem.apply_lifting(self.b.x.array, [self.a_compiled], [self.bcs])
+        self.b.x.scatter_reverse(la.InsertMode.add)
+        [bc.set(self.b.x.array) for bc in self.bcs]
+
+        A_inv = scipy.sparse.linalg.splu(self._A_scipy)
+        self.uh.x.array[:] = A_inv.solve(self.b.x.array)
+        return self.uh
+    
 
 class FEniCSx_solver:
     def __init__(self, pde_data, loss_form):
@@ -33,7 +60,12 @@ class FEniCSx_solver:
         rh = f * self.yh * ufl.dot(b, ufl.grad(v)) * ufl.dx
 
         # 1st LinearProblem
-        self.prblm = LinearProblem(a=a + sh, L=L+rh, bcs=bcs, u=self.uh)
+        self.prblm = LinearSolver(
+            a=a + sh, 
+            L=L+rh, 
+            bcs=bcs, 
+            uh=self.uh
+        )
         self.prblm.solve()
 
 
@@ -47,36 +79,30 @@ class FEniCSx_solver:
 
         #the trial function needs to be substituted with a coefficient function in order for symbolic differentiation to work.
         self.w = ufl.Coefficient(Wh) 
-        self.Rh = ufl.replace(a+sh - L-rh, {u:self.w})
+        self.Rh = ufl.replace(a+sh - L-rh, {u:self.uh})
         self.loss_form = loss_form
 
         #forms for the adjoint problem
-        Rh_w = ufl.derivative(form=self.Rh, coefficient=self.w, argument=u)
+        Rh_w = ufl.derivative(form=self.Rh, coefficient=self.uh, argument=u)
         D_Ih = ufl.derivative(form=self.loss_form, coefficient=self.uh, argument=v)
         self.psi = fem.Function(Wh)
+        adjoint_bilin = ufl.replace(ufl.adjoint(Rh_w), {self.uh:v})
         # 2nd LinearProblem
-        self.adj_prblm = LinearProblem(a=ufl.adjoint(Rh_w), L=D_Ih, bcs=hom_bcs, u=self.psi)
+        self.adj_prblm = LinearSolver(
+            a=adjoint_bilin, 
+            L=D_Ih, 
+            bcs=hom_bcs, 
+            uh=self.psi
+        )
         self.adj_prblm.solve()
 
 
-
         #The gradient problem
-        
-        #volume of the cells needs to be factored out for gradient computation
-        y = ufl.TestFunction(Yh)
-        cvol = fem.assemble_vector(fem.form(y * ufl.dx)).array
-        vol_fn = fem.Function(Yh)
-        vol_fn.x.array[:len(cvol)] = 1/cvol
-        vol_fn.x.scatter_forward()
 
         #forms for the gradient computation
         z = ufl.TrialFunction(Yh)
         self.grd_fn = fem.Function(Yh)
-        Rh_y = ufl.replace(ufl.derivative(form=self.Rh, coefficient=self.yh, argument=y), {self.w:self.uh, v:self.psi})
-
-        # 3rd LinearProblem
-        self.grd_prblm = LinearProblem(a=y * vol_fn * z * ufl.dx, L=-Rh_y, bcs=[], u=self.grd_fn)
-        self.grd_prblm.solve()
+        self.Rh_y = ufl.action(ufl.adjoint(ufl.derivative(form=-self.Rh, coefficient=self.yh, argument=z)), self.psi)
 
 
     def set_weights(self, weights):
@@ -84,23 +110,15 @@ class FEniCSx_solver:
         self.yh.x.array[:self.owned_cells] = weights[:self.owned_cells]
         self.yh.x.scatter_forward()
 
-        #reassemble matrices and vectors and compute solutions for the LinearProblems
-        self.prblm.A.assemble()
-        self.prblm.b.assemble()
         self.prblm.solve()
 
-        self.adj_prblm.A.assemble()
-        self.adj_prblm.b.assemble()
         self.adj_prblm.solve()
-
-        self.grd_prblm.b.assemble()
-        self.grd_prblm.solve()
     
     def loss(self):
         return fem.assemble_scalar(fem.form(self.loss_form))
 
     def grad(self):
-        return self.grd_fn.x.array[:self.owned_cells]
+        return fem.assemble_vector(fem.form(self.Rh_y)).array
     
 
 
