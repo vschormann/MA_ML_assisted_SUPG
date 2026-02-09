@@ -30,6 +30,7 @@ class LinearSolver:
         self.uh.x.array[:] = A_inv.solve(self.b.x.array)
         return self.uh
     
+    
 
 class FEniCSx_solver:
     def __init__(self, pde_data, loss_form):
@@ -80,11 +81,17 @@ class FEniCSx_solver:
         #the trial function needs to be substituted with a coefficient function in order for symbolic differentiation to work.
         self.w = ufl.Coefficient(Wh) 
         self.Rh = ufl.replace(a+sh - L-rh, {u:self.uh})
+        self.loc_loss_form = loss_form
         self.loss_form = loss_form
+        for integral in self.loc_loss_form.integrals():
+            integrand = integral.integrand()
+            self.loc_loss_form = ufl.replace(self.loc_loss_form, {integrand: integrand * ufl.TestFunction(Yh)})
+        self.local_loss = fem.Function(Yh)
+        fem.assemble_vector(self.local_loss.x.array, fem.form(self.loc_loss_form))
 
         #forms for the adjoint problem
         Rh_w = ufl.derivative(form=self.Rh, coefficient=self.uh, argument=u)
-        D_Ih = ufl.derivative(form=self.loss_form, coefficient=self.uh, argument=v)
+        D_Ih = ufl.derivative(form=loss_form, coefficient=self.uh)#, argument=v)
         self.psi = fem.Function(Wh)
         adjoint_bilin = ufl.replace(ufl.adjoint(Rh_w), {self.uh:v})
         # 2nd LinearProblem
@@ -103,7 +110,8 @@ class FEniCSx_solver:
         z = ufl.TrialFunction(Yh)
         self.grd_fn = fem.Function(Yh)
         self.Rh_y = ufl.action(ufl.adjoint(ufl.derivative(form=-self.Rh, coefficient=self.yh, argument=z)), self.psi)
-
+        self.grd = fem.Function(Yh)
+        fem.assemble_vector(self.grd.x.array, fem.form(self.Rh_y))
 
     def set_weights(self, weights):
         #set weights for locally owned dofs
@@ -113,12 +121,18 @@ class FEniCSx_solver:
         self.prblm.solve()
 
         self.adj_prblm.solve()
-    
+
+        self.local_loss.x.array[:] = 0
+        self.grd.x.array[:] = 0
+        fem.assemble_vector(self.local_loss.x.array, fem.form(self.loc_loss_form))
+        fem.assemble_vector(self.grd.x.array, fem.form(self.Rh_y))
+
     def loss(self):
-        return fem.assemble_scalar(fem.form(self.loss_form))
+        return self.local_loss.x.array.sum()
+        
 
     def grad(self):
-        return fem.assemble_vector(fem.form(self.Rh_y)).array
+        return self.grd.x.array
     
 
 
