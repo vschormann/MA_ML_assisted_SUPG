@@ -2,11 +2,38 @@ from dolfinx import mesh as msh, fem, io, default_scalar_type
 from mpi4py import MPI
 import ufl
 import numpy as np
-from utils.FEniCSx_solver import FEniCSx_solver
+from utils.FEniCSx_solver import SUPG_grad_adjoint_method_solver, SUPG_grad_activation_solver
 import gmsh
 
 
-class wedge(FEniCSx_solver):
+def I_cross(pde_data):
+    mesh,Wh,uh,eps,b,c,f,_,bcs = pde_data
+    cid_lims = mesh.topology.index_map(2).local_range
+    marker_ids = np.arange(cid_lims[0], cid_lims[1])
+
+    for index in range(cid_lims[0],cid_lims[1]):
+        if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
+                marker_ids = marker_ids[marker_ids!=index]
+
+    marker = np.ones_like(marker_ids, dtype=np.int32)
+    cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
+    dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
+
+    residual = -eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh))
+
+    if c != None:
+         residual +=c*uh
+         
+    residual = (residual-f)**2*dx
+
+
+    b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
+    cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
+    crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
+    return residual + crosswind_loss
+
+
+class wedge(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -36,44 +63,11 @@ class wedge(FEniCSx_solver):
 
         pde_data = mesh,Wh,uh,eps,b,None,f,None,bcs
 
-
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
+        loss = I_cross(pde_data=pde_data)
         super().__init__(pde_data=pde_data, loss_form=loss)
 
 
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class bump(FEniCSx_solver):
+class bump(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -110,46 +104,12 @@ class bump(FEniCSx_solver):
         bcs = [fem.dirichletbc(fem.Constant(mesh, default_scalar_type(0.0)), boundary_dofs, Wh)]
 
         pde_data = mesh,Wh,uh,eps,b,None,f,None,bcs
+        loss = I_cross(pde_data=pde_data)
 
-
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
         super().__init__(pde_data=pde_data, loss_form=loss)
 
 
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class cylinder(FEniCSx_solver):
+class cylinder(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -177,33 +137,19 @@ class cylinder(FEniCSx_solver):
         expr = 16*x[0]*(1-x[0])*x[1]*(1-x[1])*(1/2+ufl.atan(2*eps**(-1/2)*(0.25**2-(x[0]-0.5)**2-(x[1]-1/2)**2))/ufl.pi)
         f = -eps * expr.dx(i).dx(i) + b[i]*expr.dx(i)
         u_exact = fem.Expression(expr, Wh.element.interpolation_points())
-        uD = fem.Function(Wh)
+        self.uD = fem.Function(Wh)
 
-        uD.interpolate(u_exact)
+        self.uD.interpolate(u_exact)
 
-        bcs = [fem.dirichletbc(uD, boundary_dofs)]
+        bcs = [fem.dirichletbc(self.uD, boundary_dofs)]
 
         pde_data = mesh,Wh,uh,eps,b,None,f,None,bcs
 
-        loss = (uh-uD)**2 * ufl.dx
+        loss = (uh-self.uD)**2 * ufl.dx
         super().__init__(pde_data=pde_data, loss_form=loss)
 
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
 
-
-        self.upper = 100*self.yh.x.array
-
-
-class lifted_edge(FEniCSx_solver):
+class lifted_edge(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -235,58 +181,17 @@ class lifted_edge(FEniCSx_solver):
         expr = x[0]*x[1]**2 - x[1]**2*ufl.exp(2*(x[0]-1)/(eps)) - x[0]*ufl.exp(3*(x[1]-1)/eps) + ufl.exp((2*(x[0]-1)+3*(x[1]-1))/eps)
         f = -eps * ufl.div(ufl.grad(expr)) + ufl.dot(b,ufl.grad(expr)) + c*expr
         u_exact = fem.Expression(expr, Wh.element.interpolation_points())
-        uD = fem.Function(Wh)
-        uD.interpolate(u_exact)
-        bcs = [fem.dirichletbc(uD, boundary_dofs)]
+        self.uD = fem.Function(Wh)
+        self.uD.interpolate(u_exact)
+        bcs = [fem.dirichletbc(self.uD, boundary_dofs)]
 
         pde_data = mesh,Wh,uh,eps,b,c,f,None,bcs
 
-
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-        x = ufl.SpatialCoordinate(mesh)
-        ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - ((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps))- ufl.exp(-1/eps))/(1-ufl.exp(-1/eps)))
-
-        exp = fem.Expression(ex_exp, Wh.element.interpolation_points())
-
-        self.uD = fem.Function(Wh)
-        self.uD.interpolate(exp)
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) + c * uh - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
+        loss = (uh-self.uD)**2 * ufl.dx
         super().__init__(pde_data=pde_data, loss_form=loss)
 
 
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class falloff(FEniCSx_solver):
+class falloff(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -312,74 +217,35 @@ class falloff(FEniCSx_solver):
 
 
         eps = fem.Constant(mesh, default_scalar_type(eps_val))
-        b = ufl.as_vector((fem.Constant(mesh, ufl.cos(-ufl.pi/default_scalar_type(b1_val))),fem.Constant(mesh, ufl.sin(ufl.pi/default_scalar_type(b2_val)))))
+        b = ufl.as_vector((fem.Constant(mesh, ufl.cos(-ufl.pi/default_scalar_type(b1_val))),fem.Constant(mesh, ufl.sin(-ufl.pi/default_scalar_type(b2_val)))))
         f = fem.Constant(mesh, default_scalar_type(f_val))
         x = ufl.SpatialCoordinate(mesh)
         expr = ufl.conditional(ufl.Or(ufl.eq(x[0],1), ufl.le(x[1],0.7)), 0, 1)
         u_exact = fem.Expression(expr, Wh.element.interpolation_points())
-        uD = fem.Function(Wh)
-        uD.interpolate(u_exact)
-        bcs = [fem.dirichletbc(uD, boundary_dofs)]
+        self.uD = fem.Function(Wh)
+        self.uD.interpolate(u_exact)
+        bcs = [fem.dirichletbc(self.uD, boundary_dofs)]
 
         pde_data = mesh,Wh,uh,eps,b,None,f,None,bcs
 
-
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-        x = ufl.SpatialCoordinate(mesh)
-        ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - ((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps))- ufl.exp(-1/eps))/(1-ufl.exp(-1/eps)))
-
-        exp = fem.Expression(ex_exp, Wh.element.interpolation_points())
-
-        self.u_ex = fem.Function(Wh)
-        self.u_ex.interpolate(exp)
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
+        loss = I_cross(pde_data=pde_data)
         super().__init__(pde_data=pde_data, loss_form=loss)
 
 
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class hemker(FEniCSx_solver):
+class hemker(SUPG_grad_activation_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
         mesh=None, 
-        cell_type=msh.CellType.quadrilateral,
+        h_max=0.2,
+        h_min=0.1,
         p=1,
         eps_val=1e-4,
         b1_val=1.0,
         b2_val=0.0,
         f_val=0.0,
-        g_val=0
+        g_val=0,
+        t0=0.03
     ):
         
         if mesh == None:
@@ -403,7 +269,8 @@ class hemker(FEniCSx_solver):
             boundary_idx = [idx for (dim, idx) in boundary if dim == 1]
 
             gmsh.model.addPhysicalGroup(1, boundary_idx)
-            gmsh.option.setNumber("Mesh.CharacteristicLengthMax", 0.2)
+            gmsh.option.setNumber("Mesh.CharacteristicLengthMax", h_max)
+            gmsh.option.setNumber("Mesh.CharacteristicLengthMin", h_min)
             gmsh.model.mesh.generate(2)
             gmsh.model.mesh.setOrder(1)
             mesh, _, _ = io.gmshio.model_to_mesh(
@@ -434,52 +301,16 @@ class hemker(FEniCSx_solver):
         
         pde_data = mesh,Wh,uh,eps,b,None,f,g,bcs
 
-
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-        x = ufl.SpatialCoordinate(mesh)
-        ex_exp = x[0]*(1-ufl.exp(-(1-x[0])/eps))* (1 - ((ufl.exp(-(1-x[1])/eps)  + ufl.exp(-(x[1])/eps))- ufl.exp(-1/eps))/(1-ufl.exp(-1/eps)))
-
-        exp = fem.Expression(ex_exp, Wh.element.interpolation_points())
-
-        self.u_ex = fem.Function(Wh)
-        self.u_ex.interpolate(exp)
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
+        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * ufl.dx
         b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
         cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
-        super().__init__(pde_data=pde_data, loss_form=loss)
-
-
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
+        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * ufl.dx
+        loss = residual
+        #loss = I_cross(pde_data=pde_data)
+        super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
     
-class curved_wall(FEniCSx_solver):
+class curved_wall(SUPG_grad_activation_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -489,7 +320,8 @@ class curved_wall(FEniCSx_solver):
         cell_type=msh.CellType.quadrilateral,
         p=1,
         eps_val=1e-8,
-        f_val = 0.0
+        f_val = 0.0,
+        t0=0.03
     ):
         
         if mesh == None:
@@ -513,45 +345,12 @@ class curved_wall(FEniCSx_solver):
 
         pde_data = mesh,Wh,uh,eps,b,None,f,None,bcs
 
+        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * ufl.dx
+        loss = residual
+        super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
 
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
-
-
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
-        super().__init__(pde_data=pde_data, loss_form=loss)
-
-
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class curved_wave(FEniCSx_solver):
+class curved_wave(SUPG_grad_activation_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -562,7 +361,8 @@ class curved_wave(FEniCSx_solver):
         p=1,
         eps_val=1e-8,
         f_val = 0.0,
-        g_val = 0.0
+        g_val = 0.0,
+        t0 = 0.03
     ):
         
         if mesh == None:
@@ -600,44 +400,14 @@ class curved_wave(FEniCSx_solver):
         pde_data = mesh,Wh,uh,eps,b,None,f,g,bcs
 
 
+        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * ufl.dx
 
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
+        loss = residual
+        super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
+        self.upper = 5*self.yh.x.array
 
 
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
-        super().__init__(pde_data=pde_data, loss_form=loss)
-
-
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
-
-
-class curved_waves(FEniCSx_solver):
+class curved_waves(SUPG_grad_activation_solver):
     def __init__(
         self,
         comm=MPI.COMM_WORLD, 
@@ -648,7 +418,8 @@ class curved_waves(FEniCSx_solver):
         p=1,
         eps_val=1e-8,
         f_val = 0.0,
-        g_val = 0.0
+        g_val = 0.0,
+        t0 = 1
     ):
         
         if mesh == None:
@@ -707,38 +478,9 @@ class curved_waves(FEniCSx_solver):
         pde_data = mesh,Wh,uh,eps,b,None,f,g,bcs
 
 
-
-        cid_lims = mesh.topology.index_map(2).local_range
-        marker_ids = np.arange(cid_lims[0], cid_lims[1])
-
-        for index in range(cid_lims[0],cid_lims[1]):
-            if np.intersect1d(Wh.dofmap.cell_dofs(index), bcs[0].dof_indices()[0]).size > 0:
-                    marker_ids = marker_ids[marker_ids!=index]
-
-        marker = np.ones_like(marker_ids, dtype=np.int32)
-        cell_tag = msh.meshtags(mesh, mesh.topology.dim, marker_ids, marker)
-        dx = ufl.Measure("dx", domain=mesh, subdomain_data=cell_tag, subdomain_id=1)
+        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * ufl.dx
+        loss = residual
+        super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
 
-        residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * dx
-
-        b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
-        cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
-        crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * dx
-        loss = residual + crosswind_loss
-        super().__init__(pde_data=pde_data, loss_form=loss)
-
-
-        norm_b = ufl.sqrt(ufl.dot(b,b))
-        h = ufl.CellDiameter(domain=mesh) 
-        alpha = norm_b*h/(2*eps)
-        Xi = (1/ufl.tanh(alpha)-1/alpha)
-        tau_K = h/(2*norm_b)*Xi
-        Th = fem.functionspace(mesh, ('DG', 0))
-        tau = fem.Function(Th)
-        tau_exp = fem.Expression(tau_K, Th.element.interpolation_points())
-        tau.interpolate(tau_exp)
-        self.set_weights(tau.x.array)
-
-
-        self.upper = 100*self.yh.x.array
+        self.upper = 5*self.yh.x.array
