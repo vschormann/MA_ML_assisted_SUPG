@@ -6,51 +6,7 @@ FEM-routines are implemented using FEniCsx - in particular [Dolfinx](doi.org/10.
 [Pytorch](https://arxiv.org/abs/1912.01703v1) is used to implement the Neutral Networks.
 
 
-# Modules
-Currently there are two modules in this project. One to handle FEM-computations using FEniCsx and one to bridge FEniCsx and Pytorch.
 
-## [supg](/supg/) 
-This module stores a [class](/supg/supg.py) that stores solvers for the SUPG-approximation, the gradient with respect to the SUPG-parameters, the loss value and a local loss on the individual cells. The object can be initialized with the following data
-- domain: dolfinx.mesh.Mesh
-- Wh: dolfinx.fem.FunctionSpace
-- Coefficients for eps, b, c, f (any input that ufl treats as a coefficient ufl.Constant, dolfinx.fem.Function, ...)
-- bcs: a list of dolfinx.fem.DirichletBC
-- boundary_eval: optional boolean to toggle evaluation of the loss function at the Dirichlet boundary. 
-
-It stores instances of the dolfinx.fem.petsc.LinearProblem and their solutions which are updated by the function set_weights. If None it is set to True.
-
-Some example problems are stored in tuples in an [extra file](/supg/sp_problems.py) and can be imported as dat+\[nr]. For example: an supg.data object can be initialized with:
-
-```Python
-from supg import supg
-from supg.sp_problems import dat1 as dat
-
-sd = supg.data(*dat, False)
-```
-
-The module also contains a [convenience class](/supg/plotter.py) that stores a pyvista.UnstructuredGrid created from a dolfinx.fem.FunctionSpace to simplify visualization. 
-
-There is additional functionality for tabulating and visualizing functions on facets to evaluate jumps. But currently it isn't used in any of the routines and might be removed or moved to a different file later.
-
-## [torch_classes](/torch_classes/)
-This module creates a bridge between Pytorch and Dolfinx by subclassing torch.autograd.Function. The [object](/torch_classes/supg_torch.py) takes 
-- a supg.data-object and
-- a torch.Tensor
-
-where the forward pass takes the global_loss value from the supg.data object and the backward pass the constrained_gradient. The supg_loss function takes the same arguments and can be used in Pytorch routines.
-
-> Note that all PDE-related computations including the symbolic differentiations needed to compute the gradient are done in Dolfinx and UFL. Pytorch.autograd mechanics are only used when propagating gradients backwards in a neural network.
-
-The module also stores different instances of subclasses of torch.nn.Module as neural network models.
-
-# Tests
-Files that provide a sanity check for the modules listed above. 
-1. [Test_1_gradcheck](/Test_1_gradcheck.py) compares the gradient computed with dolfinx to a numerically computed gradient using torch.autograd.gradcheck ten times. Note that this requires the device to be set to cpu and the dtype to double to maximize precision. Still out of the ten tests implemented usually 3 or more will fail even though absolute tolerance is set to 1e-2.
-
-2. [Test_2_compare_Fenicsx_Pytorch](/Test_2_compare_FenicsX_Pytorch.py) implements a simple gradients descent using a supg.data object and NumPy and compares its loss values and solution to a Pytorch model that uses a the supg_loss function from [supg_torch](/torch_classes/supg_torch.py), a trainable vector and torch.optim.SGD to make sure the Pytorch classes work as expected.
-
-# Examples
-Codes that experiment with the models, create visualizations in form of images, gifs and mp4-videos.
 
 # Acknowledgements
 
