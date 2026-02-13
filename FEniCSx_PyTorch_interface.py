@@ -1,5 +1,7 @@
 import torch
 
+
+
 class FEniCSx_PyTorch_interface(torch.autograd.Function):
     @staticmethod
     def forward(weights, sd):
@@ -19,3 +21,4 @@ class FEniCSx_PyTorch_interface(torch.autograd.Function):
     def backward(ctx, grad_output):
         grad = torch.tensor(ctx.grad, dtype=ctx.dtype, device=ctx.device)
         return grad_output * grad, None
+    

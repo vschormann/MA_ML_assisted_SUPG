@@ -1,9 +1,65 @@
 import ufl
-from dolfinx import default_scalar_type, fem, la, mesh as msh
+from dolfinx import default_scalar_type, fem, la, mesh as msh, plot
 from dolfinx.fem import functionspace
 from dolfinx.fem.petsc import LinearProblem
 import numpy as np
 import scipy
+import pyvista
+
+
+
+class fem_plotter_grid:
+    def __init__(self, Wh):
+        c_topology, c_cell_types, c_geometry = plot.vtk_mesh(Wh)
+        self.grid = pyvista.UnstructuredGrid(c_topology, c_cell_types, c_geometry)
+
+    def add_data(self, u, point=True):
+        self.grid.point_data.clear()
+        self.grid.cell_data.clear()
+
+        if isinstance(u, np.ndarray):
+            val = u
+        else:
+            val = u.x.array.real
+        if point:
+            try:
+                self.grid.point_data['u'] = val
+            except:
+                self.grid.cell_data['u'] = val
+                self.grid = self.grid.cell_data_to_point_data()
+        else:
+            try:
+                self.grid.cell_data['u'] = val
+            except:
+                self.grid.point_data['u'] = val
+                self.grid = self.grid.point_data_to_cell_data()
+        
+        if point:
+            self.grid.set_active_scalars('u', preference='point')
+        else:
+            self.grid.set_active_scalars('u', preference='cell')
+
+
+def interpolate_expr(expr, Wh):
+    f = fem.Function(Wh)
+    if expr ==None:
+        fem_expr = fem.Expression(fem.Constant(Wh.mesh, default_scalar_type(0)), Wh.element.interpolation_points())
+    else:
+        fem_expr = fem.Expression(expr, Wh.element.interpolation_points())
+    f.interpolate(fem_expr)
+    return f
+
+def plot_fn(fn, warp=True):
+    g = fem_plotter_grid(fn.function_space)
+    g.add_data(fn)
+    p = pyvista.Plotter()
+    if warp:
+        p.add_mesh(g.grid.warp_by_scalar(), show_edges=True)
+    else:
+        p.camera_position = 'xy'
+        p.add_mesh(g.grid, show_edges=True)
+    p.show()
+
 
 
 class LinearSolver:

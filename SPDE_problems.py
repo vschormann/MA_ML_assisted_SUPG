@@ -2,10 +2,44 @@ from dolfinx import mesh as msh, fem, io, default_scalar_type
 from mpi4py import MPI
 import ufl
 import numpy as np
-from utils.FEniCSx_solver import SUPG_grad_adjoint_method_solver, SUPG_grad_activation_solver
+from FEniCSx_solver import SUPG_grad_adjoint_method_solver, SUPG_grad_activation_solver
 import gmsh
+from Training_utils import train_set, test_set
+from dolfinx.io import XDMFFile
+
+def int_to_prblm(idx, mesh):
+    if idx == 0:
+        return wedge(mesh=mesh)
+    if idx == 1:
+        return bump(mesh=mesh)
+    if idx == 2:
+        return lifted_edge(mesh=mesh)
+    if idx == 3:
+        return cylinder(mesh=mesh)
+    if idx == 4:
+        return falloff(mesh=mesh)
+    if idx == 5:
+        return curved_wave(mesh=mesh)
+    if idx == 6:
+        return curved_waves(mesh=mesh)
+    
+def Data_to_solver(num, train=True):
+    if train:
+        set = train_set
+        st = 'training_set'
+    else:
+        set = test_set
+        st = 'test_set'
+
+    G=set[num]
+
+    with XDMFFile(MPI.COMM_WORLD, f"data/{st}/mesh_files/mesh_{G.mesh_id[0]}.xdmf", "r") as xdmf:
+        mesh = xdmf.read_mesh(name="mesh")
 
 
+    fs = int_to_prblm(idx=G.prblm_id, mesh=mesh)
+    return fs, G
+    
 def I_cross(pde_data):
     mesh,Wh,uh,eps,b,c,f,_,bcs = pde_data
     cid_lims = mesh.topology.index_map(2).local_range
