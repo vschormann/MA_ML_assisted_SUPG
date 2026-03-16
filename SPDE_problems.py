@@ -6,6 +6,7 @@ from FEniCSx_solver import SUPG_grad_adjoint_method_solver, SUPG_grad_activation
 import gmsh
 from Training_utils import train_set, test_set
 from dolfinx.io import XDMFFile
+import torch
 
 def int_to_prblm(idx, mesh):
     if idx == 0:
@@ -31,9 +32,9 @@ def Data_to_solver(num, train=True):
         set = test_set
         st = 'test_set'
 
-    G=set[num]
+    G=torch.load(f"data/{st}/input_values/raw/G_{num}.pt", weights_only=False)
 
-    with XDMFFile(MPI.COMM_WORLD, f"data/{st}/mesh_files/mesh_{G.mesh_id[0]}.xdmf", "r") as xdmf:
+    with XDMFFile(MPI.COMM_WORLD, f"data/{st}/mesh_files/mesh_{G.mesh_id}.xdmf", "r") as xdmf:
         mesh = xdmf.read_mesh(name="mesh")
 
 
@@ -438,7 +439,7 @@ class curved_wave(SUPG_grad_activation_solver):
 
         loss = residual
         super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
-        self.upper = 5*self.yh.x.array
+        self._upper = 5*self.yh.x.array
 
 
 class curved_waves(SUPG_grad_activation_solver):
@@ -517,4 +518,4 @@ class curved_waves(SUPG_grad_activation_solver):
         super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
 
-        self.upper = 5*self.yh.x.array
+        self._upper = 5*self.yh.x.array

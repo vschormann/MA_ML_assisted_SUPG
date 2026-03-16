@@ -203,3 +203,61 @@ class GATv2(torch.nn.Module):
         h = self.conv10(x=h, edge_index=edge_index)
 
         return h
+    
+
+
+class MIX(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.conv1 = tg.nn.conv.GATv2Conv(10, 4)
+        self.conv2 = tg.nn.conv.GATv2Conv(4, 4)
+        self.conv3 = tg.nn.conv.GATv2Conv(4, 4)
+        self.act1 = tg.nn.models.MLP(in_channels=4, hidden_channels=4,out_channels=4, num_layers=3)
+        self.act2 = tg.nn.models.MLP(in_channels=4, hidden_channels=4,out_channels=4, num_layers=3)
+        self.act3 = tg.nn.models.MLP(in_channels=4, hidden_channels=4,out_channels=4, num_layers=3)
+        self.mlp = tg.nn.models.MLP(in_channels=4, hidden_channels=4,out_channels=1, num_layers=16)
+    def forward(self, data) -> torch.Tensor:
+        x, edge_index = data.x, data.edge_index
+        h = self.conv1(x=x, edge_index=edge_index)
+        h = self.act1(x=h)
+        h = self.conv2(x=h, edge_index=edge_index)
+        h = self.act2(x=h)
+        h = self.conv3(x=h, edge_index=edge_index)
+        h = self.act3(x=h)
+        h=self.mlp(x=h)
+        h = torch.clamp(input=h, min=torch.zeros_like(data.y), max=100*torch.ones_like(data.y))
+
+        return h
+    
+
+class ClampRestriction(torch.nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model()
+    def forward(self, data) -> torch.Tensor:
+        upper = 100*torch.ones_like(data.y)
+        model_out = self.model(data)
+        return torch.clamp(input=model_out, min=torch.zeros_like(data.y), max=upper)
+
+
+
+class SigmoidRestriction(torch.nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model()
+    def forward(self, data) -> torch.Tensor:
+        upper = 100*torch.ones_like(data.y)
+        model_out = self.model(data)
+        return upper*model_out.sigmoid()
+    
+
+class PenaltyRestriction(torch.nn.Module):
+    def __init__(self, model, penalty=100):
+        super().__init__()
+        self.model = model()
+        self.penalty = penalty
+    def forward(self, data) -> torch.Tensor:
+        upper = 100*torch.ones_like(data.y)
+        model_out = self.model(data)
+        return model_out + self.penalty * (model_out.clamp(max=0) + model_out-model_out.clamp(max=upper))
