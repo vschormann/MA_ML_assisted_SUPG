@@ -1,6 +1,7 @@
 import torch
 from Training_utils import train_loader, train
 import torch_geometric as tg
+from torch_geometric import utils
 
 class MLP(torch.nn.Module):
     def __init__(self):
@@ -230,13 +231,21 @@ class MIX(torch.nn.Module):
 
         return h
     
+class AbsRestriction(torch.nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model()
+    def forward(self, data) -> torch.Tensor:
+        model_out = self.model(data)
+        return torch.abs(model_out)
+    
 
 class ClampRestriction(torch.nn.Module):
     def __init__(self, model):
         super().__init__()
         self.model = model()
     def forward(self, data) -> torch.Tensor:
-        upper = 100*torch.ones_like(data.y)
+        upper = data.upper
         model_out = self.model(data)
         return torch.clamp(input=model_out, min=torch.zeros_like(data.y), max=upper)
 
@@ -247,7 +256,7 @@ class SigmoidRestriction(torch.nn.Module):
         super().__init__()
         self.model = model()
     def forward(self, data) -> torch.Tensor:
-        upper = 100*torch.ones_like(data.y)
+        upper = data.upper
         model_out = self.model(data)
         return upper*model_out.sigmoid()
     
@@ -258,6 +267,80 @@ class PenaltyRestriction(torch.nn.Module):
         self.model = model()
         self.penalty = penalty
     def forward(self, data) -> torch.Tensor:
-        upper = 100*torch.ones_like(data.y)
+        upper = data.upper
         model_out = self.model(data)
         return model_out + self.penalty * (model_out.clamp(max=0) + model_out-model_out.clamp(max=upper))
+
+class DirOpt(torch.nn.Module):
+    def __init__(self, Psl, dtype=torch.float32):
+        super().__init__()
+        self.nn = torch.nn.Identity()
+        self.parameters = [torch.tensor(ps.fs.yh.x.array, dtype=dtype).reshape(-1,1) for ps in Psl]
+        for p in self.parameters:
+            p.requires_grad = True
+    def forward(self, data) -> torch.Tensor:
+        return torch.clamp(self.nn(self.parameters[0]), min=torch.zeros_like(data.y), max=data.upper)
+    
+
+
+class mha(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.gat1 = tg.nn.models.GAT(
+            in_channels=7,
+            hidden_channels=5,
+            num_layers=2,
+            out_channels=4, 
+            v2 = True,
+            edge_dim=2,
+            add_self_loops=False
+        )
+        self.gat2 = tg.nn.models.GAT(
+
+            in_channels=4,
+            hidden_channels=4,
+            num_layers=2,
+            out_channels=4, 
+            v2 = True,
+            add_self_loops=False
+        )
+        self.gat3 = tg.nn.models.GAT(
+            in_channels=4,
+            hidden_channels=4,
+            num_layers=2,
+            out_channels=4, 
+            v2 = True,
+            edge_dim=2,
+            add_self_loops=False
+        )
+        self.pattn1 = tg.nn.attention.PerformerAttention(channels=4, heads=1)
+        self.pattn2 = tg.nn.attention.PerformerAttention(channels=4, heads=2)
+        self.mlp = tg.nn.models.MLP(
+            in_channels=4,
+            hidden_channels=16,
+            num_layers=3,
+            out_channels=1,
+        )
+
+    def forward(self, data) -> torch.Tensor:
+        batch, x, edge_index, edge_attr  = data.batch, data.x, data.edge_index, data.edge_attr
+        h = self.gat1(
+            x=x,
+            edge_index=edge_index,
+            edge_attr=edge_attr
+        ).relu()
+        h, mask = utils.to_dense_batch(x=h, batch=batch)
+        h = self.pattn1(h)[mask]
+        h = self.gat2(
+            x=h,
+            edge_index=edge_index
+        ).relu()
+        h, mask = utils.to_dense_batch(x=h, batch=batch)
+        h = self.pattn2(h)[mask]
+        h = self.gat3(
+            x=h,
+            edge_index=edge_index,
+            edge_attr=edge_attr
+        ).relu()
+        h=self.mlp(h)
+        return torch.abs(h)

@@ -23,16 +23,25 @@ def int_to_prblm(idx, mesh):
         return curved_wave(mesh=mesh)
     if idx == 6:
         return curved_waves(mesh=mesh)
+    if idx == 7:
+        return hemker(mesh=mesh)
     
-def Data_to_solver(num, train=True):
+def Data_to_solver(num, train=True, edge_attr=False, globalizer = False, v2=False):
     if train:
         set = train_set
         st = 'training_set'
     else:
         set = test_set
         st = 'test_set'
+    if edge_attr:
 
-    G=torch.load(f"data/{st}/input_values/raw/G_{num}.pt", weights_only=False)
+        G=torch.load(f"data/{st}_edge_attr/input_values/raw/G_{num}.pt", weights_only=False)
+    elif globalizer:
+        G=torch.load(f"data/{st}_globalizer/input_values/raw/G_{num}.pt", weights_only=False)
+    elif v2:
+        G=torch.load(f"data/{st}_v2/input_values/raw/G_{num}.pt", weights_only=False)
+    else:
+        G=torch.load(f"data/{st}/input_values/raw/G_{num}.pt", weights_only=False)
 
     with XDMFFile(MPI.COMM_WORLD, f"data/{st}/mesh_files/mesh_{G.mesh_id}.xdmf", "r") as xdmf:
         mesh = xdmf.read_mesh(name="mesh")
@@ -340,8 +349,8 @@ class hemker(SUPG_grad_activation_solver):
         b_perp = ufl.as_vector((fem.Constant(mesh, default_scalar_type(0.0)),fem.Constant(mesh, default_scalar_type(-1.0))))
         cross = abs(ufl.dot(b_perp, ufl.grad(uh)))
         crosswind_loss = ufl.conditional(ufl.lt(cross, 1), 1/2*(5*cross**2 - 3*cross**3), ufl.sqrt(cross)) * ufl.dx
-        loss = residual
-        #loss = I_cross(pde_data=pde_data)
+        #loss = residual
+        loss = I_cross(pde_data=pde_data)
         super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
     

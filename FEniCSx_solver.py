@@ -5,6 +5,7 @@ from dolfinx.fem.petsc import LinearProblem
 import numpy as np
 import scipy
 import pyvista
+from dolfinx.geometry import bb_tree, compute_collisions_points, compute_colliding_cells
 
 
 
@@ -38,7 +39,22 @@ class fem_plotter_grid:
             self.grid.set_active_scalars('u', preference='point')
         else:
             self.grid.set_active_scalars('u', preference='cell')
+        
 
+def curve_plotter(points, u):
+    mesh = u.function_space.mesh
+    tree = bb_tree(mesh, mesh.topology.dim)
+    cell_candidates = compute_collisions_points(tree, points)
+    cells = compute_colliding_cells(mesh, cell_candidates, points)
+    
+    values = np.zeros(len(points))
+    for i, point in enumerate(points):
+        if len(cells.links(i)) > 0:
+            cell = cells.links(i)[0]
+            values[i] = u.eval(point, cell)
+        else:
+            values[i] = np.nan
+    return values
 
 def interpolate_expr(expr, Wh):
     f = fem.Function(Wh)
@@ -272,15 +288,15 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
         return self.grad()
     
 
-    def optimize(self, algorithm='L-BFGS-B', ftol=1e-16, gtol=1e-16, max_iter=10000):
-        scipy.optimize.minimize(
+    def optimize(self, algorithm='L-BFGS-B', ftol=1e-16, gtol=1e-16, max_iter=10000, maxfun=20000):
+        return scipy.optimize.minimize(
             fun=self._eval,
             x0=self.yh.x.array,
             jac=self._eval_grad,
             method=algorithm,
             callback=lambda intermediate_result: print(f"J: {intermediate_result.fun}"),
             bounds=self._bounds,
-            options={'ftol':ftol, 'gtol':gtol, 'maxiter':max_iter}
+            options={'ftol':ftol, 'gtol':gtol, 'maxiter':max_iter, 'maxfun':maxfun}
         )
     
 

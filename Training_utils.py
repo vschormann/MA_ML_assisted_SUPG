@@ -13,7 +13,7 @@ def train(model, loader, optimizer, device):
         optimizer.zero_grad()
 
         out = model(data)
-        loss = F.mse_loss(out, data.y.view(-1,1))
+        loss = F.mse_loss(out, data.y)
 
         loss.backward()
         optimizer.step()
@@ -57,15 +57,14 @@ class graph_dataset(InMemoryDataset):
         torch.save((data, slices), self.processed_paths[0])
 
 train_set = graph_dataset(root="data/training_set/input_values/")
-train_set_wedge = graph_dataset(root="data/training_set_wedge/input_values/")
 test_set = graph_dataset(root="data/test_set/input_values/")
 
 class train_loader(DataLoader):
     def __init__(self, batch_size, set=None):
         if set is None:
             super().__init__(graph_dataset(root="data/training_set/input_values/"), batch_size=batch_size)
-        elif set == 'wedge':
-            super().__init__(graph_dataset(root="data/training_set_wedge/input_values/"), batch_size=batch_size)
+        else:
+            super().__init__(set, batch_size=batch_size)
 
 
 class test_loader(DataLoader):
