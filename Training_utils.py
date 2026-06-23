@@ -60,9 +60,9 @@ train_set = graph_dataset(root="data/training_set/input_values/")
 test_set = graph_dataset(root="data/test_set/input_values/")
 
 class train_loader(DataLoader):
-    def __init__(self, batch_size, set=None):
+    def __init__(self, batch_size, set=None, shuffle=True):
         if set is None:
-            super().__init__(graph_dataset(root="data/training_set/input_values/"), batch_size=batch_size)
+            super().__init__(graph_dataset(root="data/training_set/input_values/"), batch_size=batch_size, shuffle=shuffle)
         else:
             super().__init__(set, batch_size=batch_size)
 

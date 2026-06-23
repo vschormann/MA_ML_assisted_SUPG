@@ -11,6 +11,7 @@ from dolfinx.geometry import bb_tree, compute_collisions_points, compute_collidi
 
 class fem_plotter_grid:
     def __init__(self, Wh):
+        pyvista.global_theme.cmap = "coolwarm"
         c_topology, c_cell_types, c_geometry = plot.vtk_mesh(Wh)
         self.grid = pyvista.UnstructuredGrid(c_topology, c_cell_types, c_geometry)
 
@@ -66,7 +67,10 @@ def interpolate_expr(expr, Wh):
     return f
 
 def plot_fn(fn, warp=True):
-    g = fem_plotter_grid(fn.function_space)
+    try:
+        g = fem_plotter_grid(fn.function_space)
+    except:
+        g = fem_plotter_grid(fem.functionspace(mesh=fn.function_space.mesh, element=('CG',1)))
     g.add_data(fn)
     p = pyvista.Plotter()
     if warp:
@@ -74,6 +78,7 @@ def plot_fn(fn, warp=True):
     else:
         p.camera_position = 'xy'
         p.add_mesh(g.grid, show_edges=True)
+    p.reset_camera()
     p.show()
 
 
@@ -103,39 +108,6 @@ class LinearSolver:
         self.uh.x.array[:] = A_inv.solve(self.b.x.array)
         return self.uh
 
-
-class Linearsolver_activation:
-    def __init__(self, a, loc_loss_form, loc_loss, D_Ih, act, psi, bcs):
-        self.adj_compiled = fem.form(a)
-        self.L_compiled = fem.form(loc_loss_form)
-        self.dL_compiled = fem.form(D_Ih)
-        self.Adj = fem.create_matrix(self.adj_compiled)
-        self._L = loc_loss
-        self.dL = fem.create_matrix(self.dL_compiled)
-        self.bcs = bcs
-        self._Adj_scipy = self.Adj.to_scipy()
-        self._dL_scipy = self.dL.to_scipy()
-        self._psi = psi
-        self._act = act
-    
-    def solve(self):
-        self._Adj_scipy.data[:] = 0
-        self._L.x.array[:] = 0
-        self._dL_scipy.data[:] = 0
-        fem.assemble_matrix(self.Adj, self.adj_compiled, bcs=self.bcs)
-        fem.assemble_matrix(self.dL, self.dL_compiled, bcs=self.bcs)
-        fem.assemble_vector(self._L.x.array, fem.form(self.L_compiled))
-        
-        
-        vec = self._act.dx(self._L.x.array) * self._dL_scipy
-
-        fem.apply_lifting(vec, [self.adj_compiled], [self.bcs])
-        [bc.set(vec) for bc in self.bcs]
-
-        Adj_inv = scipy.sparse.linalg.splu(self._Adj_scipy)
-        self._psi.x.array[:] = Adj_inv.solve(vec)
-        return self._psi
-
     
 class loss_act_class:
     def __init__(self, t0):
@@ -143,7 +115,7 @@ class loss_act_class:
     def _z(self, x):
         return x/self.t0
     def __call__(self,x):
-        z = self._z(x)
+        z = x/self.t0
         return np.where(x>self.t0, 1, 1/2*z**4-z**3-1/2*z**2+2*z)
     def dx(self,x):
         z = self._z(x)
@@ -304,18 +276,15 @@ class SUPG_grad_activation_solver(SUPG_grad_adjoint_method_solver):
     def __init__(self, pde_data, loss_form, t0):
         self._loss_act = loss_act_class(t0)
         super().__init__(pde_data, loss_form=loss_form)
-        # 2nd LinearProblem
-        self._D_Ih = ufl.derivative(form=self._loc_loss_form, coefficient=self.uh)
-        self.adj_prblm = Linearsolver_activation(
-            a=self._adjoint_bilin, 
-            loc_loss_form=self._loc_loss_form,
-            loc_loss=self._local_loss,
-            D_Ih=self._D_Ih, 
-            act = self._loss_act,
-            bcs=self._hom_bcs, 
-            psi=self._psi
-        )
-        self.adj_prblm.solve()
-
     def local_loss(self):
-            return self._loss_act(self.adj_prblm._L.x.array)
+        return self._loss_act(self._local_loss.x.array)
+
+    def loss(self):
+        return self._loss_act(self._local_loss.x.array).sum()
+    
+    
+    def grad(self):
+        return self._loss_act.dx(self._local_loss.x.array)* self._grd.x.array
+
+
+        
