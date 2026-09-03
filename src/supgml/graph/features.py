@@ -2,8 +2,6 @@
 
 import numpy as np
 
-from supgml.fem import interpolate_expr
-
 
 STANDARD_FEATURES = (
     "diffusion",
@@ -22,6 +20,7 @@ def solver_node_features(solver):
     """Build the nine node features used by the data-generation notebook."""
 
     import ufl
+    from supgml.fem import interpolate_expr
 
     space = solver.Yh
     expressions = (

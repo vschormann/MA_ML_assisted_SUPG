@@ -11,7 +11,7 @@ This repository stores code for my masters thesis to create machine learning mod
 
 FEM-routines are implemented using FEniCsx - in particular [Dolfinx](doi.org/10.5281/zenodo.10447666) and [UFL](https://dl.acm.org/doi/10.1145/2566630). Additional computations are done using [NumPy](https://www.nature.com/articles/s41586-020-2649-2). Visualizations use [Pyvista](https://joss.theoj.org/papers/10.21105/joss.01450) and [Matplotlib](https://ieeexplore.ieee.org/document/4160265).
 
-[Pytorch](https://arxiv.org/abs/1912.01703v1) is used to implement the Neutral Networks.
+[PyTorch](https://arxiv.org/abs/1912.01703v1) is used to implement the neural networks.
 
 ## Installable package
 
