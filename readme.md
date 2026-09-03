@@ -29,6 +29,10 @@ environment before installing the `fem` extra. See
 [`docs/installation.md`](docs/installation.md) for the supported workflows and
 [`docs/refactoring.md`](docs/refactoring.md) for the migration process.
 
+The ordered thesis workflow is documented in
+[`notebooks/README.md`](notebooks/README.md). Original submitted notebooks and
+abandoned or inconclusive experiments are preserved under `notebooks/archive`.
+
 ## Package overview
 
 - `supgml.fem`: finite-element interpolation, assembly, sampling, and plotting.

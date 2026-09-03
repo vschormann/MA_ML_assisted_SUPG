@@ -3,6 +3,9 @@
 The original imports continue to work during the notebook migration. New code
 should use the package paths below.
 
+Original notebooks have moved to `notebooks/archive`; the ordered replacements
+are listed in `notebooks/README.md`.
+
 | Previous import | New import |
 | --- | --- |
 | `FEniCSx_solver` | `supgml.fem`, `supgml.supg`, `supgml.viz` |

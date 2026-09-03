@@ -13,6 +13,11 @@ The migration is intentionally staged:
 5. validate imports, pure numerical functions, model shapes, and FEM gradients;
 6. gradually reduce notebooks to configuration, package calls, and analysis.
 
+The reduction uses an archive-and-replace strategy: all submitted notebooks
+remain intact under `notebooks/archive`, while nine clean notebooks present the
+workflow in thesis order. Architecture sweeps are represented by JSON
+configuration rather than copied notebooks.
+
 Behavior-changing scientific experiments should be clearly identified in
 future commits and should not be described as part of this readability-only
 refactoring series.

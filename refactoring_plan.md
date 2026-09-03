@@ -15,15 +15,19 @@ post-submission readability refactor.
 - [x] Separate supervised training, differentiable FEM loss, and SciPy adapters.
 - [x] Keep top-level compatibility imports for the submitted notebooks.
 - [ ] Validate DOLFINx integration in the supported FEniCSx environment.
-- [ ] Migrate experiment notebooks individually when they are next rerun.
+- [x] Preserve all submitted notebooks in categorized archive directories.
+- [x] Add nine ordered canonical notebooks aligned with Chapters 4 and 5.
+- [x] Consolidate Chapter 4 training into supervised and self-supervised
+  configuration matrices.
+- [x] Extract the revised width-256 MLP/GATv2 architectures and Chapter 5 loss.
+- [ ] Execute the canonical long-running experiments in the DOLFINx environment.
 
 ## Notebook policy
 
-The notebooks are retained as research records, including their historical
-outputs and local class definitions. The package implementation is canonical
-after this refactor. When an experiment is rerun, replace its local helper
-definitions with imports documented in `docs/migration.md`; avoid rewriting all
-notebook JSON at once because that would obscure the scientific history.
+The submitted notebooks are retained under `notebooks/archive` as research
+records, including historical outputs and local definitions. They are not
+rewritten. The package implementation and the ordered notebooks directly under
+`notebooks/` are canonical after this refactor.
 
 ## Commit structure
 
