@@ -24,9 +24,15 @@ of unrelated notebooks:
 5. **Regenerate reported figures.** Notebook 09 is a read-only reporting step
    with explicit figure provenance.
 
-See the [canonical notebook sequence](notebooks.md) for the full map and the
-repository's `notebooks/README.md` for execution order. For browser-only
-reading, open the [rendered notebook collection](rendered-notebooks.md).
+### Read the notebooks in a browser
+
+For Safari, start with the [rendered notebook collection](rendered-notebooks.md).
+It links to the HTML export of every canonical notebook and requires neither a
+Jupyter kernel nor a Python installation. The `.ipynb` files are the editable,
+executable sources; the HTML pages are the browser-reading version.
+
+The [canonical notebook map](notebooks.md) explains their thesis roles, and
+`notebooks/README.md` records the execution order.
 
 ## A representative thesis comparison
 
