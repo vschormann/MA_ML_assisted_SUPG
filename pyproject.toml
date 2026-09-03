@@ -34,6 +34,9 @@ docs = [
 ]
 test = ["pytest>=7"]
 
+[project.scripts]
+supgml-train = "supgml.experiments.training:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

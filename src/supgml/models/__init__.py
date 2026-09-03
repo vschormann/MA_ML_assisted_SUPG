@@ -16,12 +16,16 @@ from .legacy import (
     SigmoidRestriction,
     mha,
 )
+from .revised import RevisedGATv2, RevisedMLP, combined_supervised_loss
 
 __all__ = [
     "GraphRegressor",
     "create_model",
     "BoundedOutput",
     "NonNegativeOutput",
+    "RevisedGATv2",
+    "RevisedMLP",
+    "combined_supervised_loss",
     "MLP",
     "GCN",
     "SAGE",

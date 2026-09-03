@@ -1,0 +1,15 @@
+{
+  "name": "chapter-4-supervised-architecture-comparison",
+  "dataset": "data/training_set/input_values",
+  "architectures": ["mlp", "gcn", "sage", "gat", "gatv2"],
+  "mode": "supervised",
+  "epochs": 20000,
+  "batch_size": 15,
+  "learning_rate": 0.001,
+  "hidden_channels": 5,
+  "num_layers": 10,
+  "output_constraint": "abs",
+  "seed": 0,
+  "device": "cpu",
+  "output_dir": "runs/ch4_supervised"
+}

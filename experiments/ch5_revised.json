@@ -1,0 +1,18 @@
+{
+  "name": "chapter-5-revised-supervised-models",
+  "dataset": "data/revised_set/input_values/raw/G_0.pt",
+  "mesh": "data/revised_set/mesh_files/mesh_0.xdmf",
+  "architectures": ["revised-mlp", "revised-gatv2"],
+  "features": "x0",
+  "target": "y_optimized_z",
+  "node_mask": "interior_dofs",
+  "mode": "supervised",
+  "epochs": 200000,
+  "batch_size": 1024,
+  "learning_rate": 0.001,
+  "scheduler": {"name": "cosine-warm-restarts", "t0": 50, "tmult": 2},
+  "loss": {"name": "huber-plus-l2", "huber_weight": 0.7, "reduction": "sum"},
+  "seed": 0,
+  "device": "cpu",
+  "output_dir": "runs/ch5_revised"
+}

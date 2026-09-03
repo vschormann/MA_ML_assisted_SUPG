@@ -1,0 +1,18 @@
+{
+  "name": "chapter-4-self-supervised-architecture-comparison",
+  "dataset": "data/training_set/input_values",
+  "architectures": ["mlp", "gcn", "sage", "gat", "gatv2"],
+  "mode": "self_supervised",
+  "epochs": 20000,
+  "batch_size": 1,
+  "learning_rate": 0.001,
+  "hidden_channels": 5,
+  "num_layers": 10,
+  "output_constraint": "abs",
+  "seed": 0,
+  "device": "cpu",
+  "data_root": "data",
+  "split": "train",
+  "variant": "standard",
+  "output_dir": "runs/ch4_self_supervised"
+}
