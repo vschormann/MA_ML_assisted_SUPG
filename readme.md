@@ -1,9 +1,45 @@
 # Readme
+
+> **Submission state and later refactoring.** Commit
+> [`aed55ecdaf7c99b4f0f89662e48eab106de8013f`](https://github.com/search?q=aed55ecdaf7c99b4f0f89662e48eab106de8013f&type=commits)
+> records the state of this repository at the time the thesis was submitted.
+> Every subsequent commit is a refactoring intended to make the repository
+> easier to read, install, test, and reuse; it does not alter which version was
+> submitted for assessment.
+
 This repository stores code for my masters thesis to create machine learning models for optimizing SUPG-parameters for singularly perturbed convection diffusion problems. [Acknowledgements](#acknowledgements) for the frameworks used are at the end of the file. Here is a short description.
 
 FEM-routines are implemented using FEniCsx - in particular [Dolfinx](doi.org/10.5281/zenodo.10447666) and [UFL](https://dl.acm.org/doi/10.1145/2566630). Additional computations are done using [NumPy](https://www.nature.com/articles/s41586-020-2649-2). Visualizations use [Pyvista](https://joss.theoj.org/papers/10.21105/joss.01450) and [Matplotlib](https://ieeexplore.ieee.org/document/4160265).
 
 [Pytorch](https://arxiv.org/abs/1912.01703v1) is used to implement the Neutral Networks.
+
+## Installable package
+
+Reusable code is being migrated from the research notebooks into the
+`supgml` package. The original top-level modules remain as compatibility
+imports while existing notebooks are migrated.
+
+```bash
+python -m pip install -e .
+python -m pip install -e '.[ml,viz]'
+```
+
+DOLFINx, PETSc, and MPI should be installed using a supported FEniCSx
+environment before installing the `fem` extra. See
+[`docs/installation.md`](docs/installation.md) for the supported workflows and
+[`docs/refactoring.md`](docs/refactoring.md) for the migration process.
+
+## Package overview
+
+- `supgml.fem`: finite-element interpolation, assembly, sampling, and plotting.
+- `supgml.supg`: SUPG solution, adjoint objectives, and parameter optimization.
+- `supgml.benchmarks`: named convection-diffusion benchmark problems.
+- `supgml.stabilization`: classical stabilization and AFC algorithms.
+- `supgml.graph` and `supgml.data`: mesh-to-graph conversion and datasets.
+- `supgml.models`, `supgml.training`, and `supgml.autograd`: prediction models
+  and supervised or FEM-backed training.
+- `supgml.optim`: adapters between PyTorch and SciPy optimization.
+- `supgml.viz`: optional PyVista and Matplotlib helpers.
 
 
 
