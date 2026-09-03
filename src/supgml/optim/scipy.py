@@ -28,13 +28,13 @@ class PyTorch_SciPy_interface():
 
     def _eval_grad(self, x):
         return torch.cat([p.grad.view(-1) for p in self.nn.parameters()]).detach().numpy()
-    
+
     def _eval(self, x):
         self._set_params(x)
         loss = self.model_eval()
         loss.backward()
         return loss.item()
-    
+
     def optimize(self, algorithm='L-BFGS-B', ftol=1e-16, gtol=1e-16, max_iter=10000):
         return minimize(
             fun=self._eval,

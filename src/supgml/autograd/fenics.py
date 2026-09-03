@@ -8,7 +8,7 @@ class FEniCSx_PyTorch_interface(torch.autograd.Function):
         fs.set_weights(w)
         err = torch.tensor(fs.loss(), dtype=weights.dtype, device=weights.device)
         return err
-    
+
     @staticmethod
     def setup_context(ctx, inputs, output):
         weights, fs = inputs
@@ -20,7 +20,7 @@ class FEniCSx_PyTorch_interface(torch.autograd.Function):
     def backward(ctx, grad_output):
         grad = torch.tensor(ctx.grad, dtype=ctx.dtype, device=ctx.device)
         return grad_output * grad, None
-    
+
 
 class fem_solver():
     def __init__(self, fs):
@@ -28,7 +28,7 @@ class fem_solver():
         self.autograd_func = FEniCSx_PyTorch_interface.apply
     def __call__(self, weights):
         return self.autograd_func(weights, self.fs)
-    
+
 class batched_loss_fn():
     """Evaluate a collection of differentiable FEM solvers by mesh ID."""
 

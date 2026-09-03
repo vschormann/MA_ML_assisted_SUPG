@@ -42,7 +42,7 @@ class MLP(torch.nn.Module):
         h = self.l10(h)
 
         return h
-    
+
 class GCN(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -81,8 +81,8 @@ class GCN(torch.nn.Module):
         h = self.conv10(x=h, edge_index=edge_index)
 
         return h
-    
-    
+
+
 class SAGE(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -123,7 +123,7 @@ class SAGE(torch.nn.Module):
 
 
         return h
-    
+
 class GAT(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -164,7 +164,7 @@ class GAT(torch.nn.Module):
         h = self.conv10(x=h, edge_index=edge_index)
 
         return h
-    
+
 class GATv2(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -203,7 +203,7 @@ class GATv2(torch.nn.Module):
         h = self.conv10(x=h, edge_index=edge_index)
 
         return h
-    
+
 
 
 class MIX(torch.nn.Module):
@@ -229,7 +229,7 @@ class MIX(torch.nn.Module):
         h = torch.clamp(input=h, min=torch.zeros_like(data.y), max=100*torch.ones_like(data.y))
 
         return h
-    
+
 class AbsRestriction(torch.nn.Module):
     def __init__(self, model):
         super().__init__()
@@ -237,7 +237,7 @@ class AbsRestriction(torch.nn.Module):
     def forward(self, data) -> torch.Tensor:
         model_out = self.model(data)
         return torch.abs(model_out)
-    
+
 
 class ClampRestriction(torch.nn.Module):
     def __init__(self, model):
@@ -258,7 +258,7 @@ class SigmoidRestriction(torch.nn.Module):
         upper = data.upper
         model_out = self.model(data)
         return upper*model_out.sigmoid()
-    
+
 
 class PenaltyRestriction(torch.nn.Module):
     def __init__(self, model, penalty=100):
@@ -280,7 +280,7 @@ class DirOpt(torch.nn.Module):
         ])
     def forward(self, data) -> torch.Tensor:
         return torch.clamp(self.nn(self.values[0]), min=torch.zeros_like(data.y), max=data.upper)
-    
+
 
 
 class mha(torch.nn.Module):
@@ -290,7 +290,7 @@ class mha(torch.nn.Module):
             in_channels=7,
             hidden_channels=5,
             num_layers=2,
-            out_channels=4, 
+            out_channels=4,
             v2 = True,
             edge_dim=2,
             add_self_loops=False
@@ -300,7 +300,7 @@ class mha(torch.nn.Module):
             in_channels=4,
             hidden_channels=4,
             num_layers=2,
-            out_channels=4, 
+            out_channels=4,
             v2 = True,
             add_self_loops=False
         )
@@ -308,7 +308,7 @@ class mha(torch.nn.Module):
             in_channels=4,
             hidden_channels=4,
             num_layers=2,
-            out_channels=4, 
+            out_channels=4,
             v2 = True,
             edge_dim=2,
             add_self_loops=False

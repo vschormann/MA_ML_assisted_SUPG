@@ -24,7 +24,7 @@ class GraphDataset(InMemoryDataset):
 
         for raw_path in self.raw_paths:
             data = torch.load(raw_path, weights_only=False)
-            
+
             assert data.x is not None
             assert data.edge_index is not None
             data_list.append(data)

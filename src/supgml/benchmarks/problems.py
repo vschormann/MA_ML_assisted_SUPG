@@ -4,7 +4,7 @@ import ufl
 import numpy as np
 from supgml.supg import SUPG_grad_adjoint_method_solver, SUPG_grad_activation_solver
 import gmsh
-    
+
 def I_cross(pde_data):
     mesh,Wh,uh,eps,b,c,f,_,bcs = pde_data
     cid_lims = mesh.topology.index_map(2).local_range
@@ -22,7 +22,7 @@ def I_cross(pde_data):
 
     if c != None:
          residual +=c*uh
-         
+
     residual = (residual-f)**2*dx
 
 
@@ -35,8 +35,8 @@ def I_cross(pde_data):
 class wedge(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -46,7 +46,7 @@ class wedge(SUPG_grad_adjoint_method_solver):
         b2_val=0.0,
         f_val=1.0
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -69,8 +69,8 @@ class wedge(SUPG_grad_adjoint_method_solver):
 class bump(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -79,7 +79,7 @@ class bump(SUPG_grad_adjoint_method_solver):
         b1_val=1.0,
         b2_val=0.0
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -93,7 +93,7 @@ class bump(SUPG_grad_adjoint_method_solver):
         x = ufl.SpatialCoordinate(mesh)
         f = ufl.conditional(
             ufl.Or(
-                ufl.ge(abs(x[0] - 0.5), 0.25), 
+                ufl.ge(abs(x[0] - 0.5), 0.25),
                 ufl.ge(abs(x[1] - 0.5), 0.25)
             ),
             0.0,
@@ -111,8 +111,8 @@ class bump(SUPG_grad_adjoint_method_solver):
 class cylinder(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -151,8 +151,8 @@ class cylinder(SUPG_grad_adjoint_method_solver):
 class lifted_edge(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -162,7 +162,7 @@ class lifted_edge(SUPG_grad_adjoint_method_solver):
         b2_val=3.0,
         c_val=1.0
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -193,8 +193,8 @@ class lifted_edge(SUPG_grad_adjoint_method_solver):
 class falloff(SUPG_grad_adjoint_method_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -204,7 +204,7 @@ class falloff(SUPG_grad_adjoint_method_solver):
         b2_val=3.0,
         f_val=0.0
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -234,8 +234,8 @@ class falloff(SUPG_grad_adjoint_method_solver):
 class hemker(SUPG_grad_activation_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         h_max=0.2,
         h_min=0.1,
         p=1,
@@ -246,7 +246,7 @@ class hemker(SUPG_grad_activation_solver):
         g_val=0,
         t0=0.03
     ):
-        
+
         if mesh == None:
             gmsh.initialize()
             center = (-3,-3,0)
@@ -276,12 +276,12 @@ class hemker(SUPG_grad_activation_solver):
                 gmsh.model, comm, 0, gdim=2)
             gmsh.finalize()
 
-        
-    
+
+
 
         Wh = fem.functionspace(mesh, ('P', p))
         uh = fem.Function(Wh)
-        
+
 
         eps = fem.Constant(mesh, default_scalar_type(eps_val))
         b = ufl.as_vector((fem.Constant(mesh, default_scalar_type(b1_val)),fem.Constant(mesh, default_scalar_type(b2_val))))
@@ -297,7 +297,7 @@ class hemker(SUPG_grad_activation_solver):
         DB_dofs1 = fem.locate_dofs_geometrical(Wh, lambda x: np.isclose(x[0], -3))
         DB_dofs2 = fem.locate_dofs_geometrical(Wh, lambda x: np.isclose(x[0]**2+x[1]**2, 1))
         bcs = [fem.dirichletbc(fem.Constant(mesh, default_scalar_type(0.0)), DB_dofs1, Wh), fem.dirichletbc(fem.Constant(mesh, default_scalar_type(1.0)), DB_dofs2, Wh)]
-        
+
         pde_data = mesh,Wh,uh,eps,b,None,f,g,bcs
 
         residual = (-eps*ufl.div(ufl.grad(uh)) + ufl.dot(b, ufl.grad(uh)) - f)**2 * ufl.dx
@@ -308,12 +308,12 @@ class hemker(SUPG_grad_activation_solver):
         loss = I_cross(pde_data=pde_data)
         super().__init__(pde_data=pde_data, loss_form=loss, t0=t0)
 
-    
+
 class curved_wall(SUPG_grad_activation_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -322,7 +322,7 @@ class curved_wall(SUPG_grad_activation_solver):
         f_val = 0.0,
         t0=0.03
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -352,8 +352,8 @@ class curved_wall(SUPG_grad_activation_solver):
 class curved_wave(SUPG_grad_activation_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -363,7 +363,7 @@ class curved_wave(SUPG_grad_activation_solver):
         g_val = 0.0,
         t0 = 0.03
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -380,14 +380,14 @@ class curved_wave(SUPG_grad_activation_solver):
         DB_dofs1 = fem.locate_dofs_geometrical(Wh, lambda x: np.isclose(x[1],0))
         DB_dofs2 = fem.locate_dofs_geometrical(Wh, lambda x: (np.isclose(x[1],1)|np.isclose(x[0],1)))
         expr = ufl.conditional(
-            ufl.le(x[0],1/3), 
-            x[0], 
+            ufl.le(x[0],1/3),
+            x[0],
             ufl.conditional(
                 ufl.And(
-                    ufl.gt(x[0], 1/3), 
+                    ufl.gt(x[0], 1/3),
                     ufl.lt(x[0], 2/3)
                 ),
-                1/3+x[0], 
+                1/3+x[0],
                 1-x[0]
             )
         )
@@ -409,8 +409,8 @@ class curved_wave(SUPG_grad_activation_solver):
 class curved_waves(SUPG_grad_activation_solver):
     def __init__(
         self,
-        comm=MPI.COMM_WORLD, 
-        mesh=None, 
+        comm=MPI.COMM_WORLD,
+        mesh=None,
         nx=16,
         ny=16,
         cell_type=msh.CellType.quadrilateral,
@@ -420,7 +420,7 @@ class curved_waves(SUPG_grad_activation_solver):
         g_val = 0.0,
         t0 = 1
     ):
-        
+
         if mesh == None:
             mesh = msh.create_unit_square(comm=comm, nx=nx, ny=ny, cell_type=cell_type)
 
@@ -437,29 +437,29 @@ class curved_waves(SUPG_grad_activation_solver):
         DB_dofs1 = fem.locate_dofs_geometrical(Wh, lambda x: np.isclose(x[1],0))
         DB_dofs2 = fem.locate_dofs_geometrical(Wh, lambda x: (np.isclose(x[1],1)|np.isclose(x[0],1)))
         expr = ufl.conditional(
-            ufl.le(x[0],1/6), 
-            6*x[0], 
+            ufl.le(x[0],1/6),
+            6*x[0],
             ufl.conditional(
                 ufl.And(
-                    ufl.ge(x[0], 1/6), 
+                    ufl.ge(x[0], 1/6),
                     ufl.le(x[0], 1/3)
                 ),
                 2-6*x[0],
                 ufl.conditional(
                     ufl.And(
-                        ufl.ge(x[0], 1/3), 
+                        ufl.ge(x[0], 1/3),
                         ufl.le(x[0], 1/2)
                     ),
                     -2+6*x[0],
                     ufl.conditional(
                         ufl.And(
-                            ufl.ge(x[0], 1/2), 
+                            ufl.ge(x[0], 1/2),
                             ufl.le(x[0], 2/3)
                         ),
                         4-6*x[0],
                         ufl.conditional(
                             ufl.And(
-                                ufl.ge(x[0], 2/3), 
+                                ufl.ge(x[0], 2/3),
                                 ufl.le(x[0], 5/6)
                             ),
                             -4+6*x[0],

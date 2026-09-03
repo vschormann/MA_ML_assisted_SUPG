@@ -31,7 +31,7 @@ class SUPG_solver:
 
         #SUPG-forms
         self._a = self.eps * ufl.dot(ufl.grad(self._u), ufl.grad(self._v)) * ufl.dx + ufl.dot(self.b, ufl.grad(self._u)) * self._v * ufl.dx
-        sh_test = (self.yh * ufl.dot(self.b, ufl.grad(self._v))) 
+        sh_test = (self.yh * ufl.dot(self.b, ufl.grad(self._v)))
         self._sh = -self.eps * ufl.div(ufl.grad(self._u)) * sh_test * ufl.dx + ufl.dot(self.b, ufl.grad(self._u)) * sh_test * ufl.dx
         if self.c != None:
             self._sh += self.c * self._u* sh_test * ufl.dx
@@ -44,9 +44,9 @@ class SUPG_solver:
 
         # 1st LinearProblem
         self.prblm = LinearSolver(
-            a=self._a + self._sh, 
-            L=self._L+self._rh, 
-            bcs=self.bcs, 
+            a=self._a + self._sh,
+            L=self._L+self._rh,
+            bcs=self.bcs,
             uh=self.uh
         )
         self.prblm.solve()
@@ -63,7 +63,7 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
     def __init__(self, pde_data, loss_form):
         super().__init__(pde_data)
         #The adjoint problem
-        
+
         #the adjoint problem needs homgenous boundary conditions.
         dbc_dofs = np.array([], dtype=np.int32)
         for bc in self.bcs:
@@ -86,9 +86,9 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
         self._adjoint_bilin = ufl.replace(ufl.adjoint(Rh_w), {self.uh:self._v})
         # 2nd LinearProblem
         self.adj_prblm = LinearSolver(
-            a=self._adjoint_bilin, 
-            L=self._D_Ih, 
-            bcs=self._hom_bcs, 
+            a=self._adjoint_bilin,
+            L=self._D_Ih,
+            bcs=self._hom_bcs,
             uh=self._psi
         )
         self.adj_prblm.solve()
@@ -103,7 +103,7 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
         fem.assemble_vector(self._grd.x.array, fem.form(self._Rh_y))
 
         norm_b = ufl.sqrt(ufl.dot(self.b,self.b))
-        h = ufl.CellDiameter(domain=self.domain) 
+        h = ufl.CellDiameter(domain=self.domain)
         alpha = norm_b*h/(2*self.eps)
         Xi = (1/ufl.tanh(alpha)-1/alpha)
         tau_K = h/(2*norm_b)*Xi
@@ -133,7 +133,7 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
 
     def loss(self):
         return self._local_loss.x.array.sum()
-        
+
 
     def grad(self):
         return self._grd.x.array
@@ -146,11 +146,11 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
     def _eval(self, weights):
         self.set_weights(weights=weights)
         return self.loss()
-    
+
 
     def _eval_grad(self, weights):
         return self.grad()
-    
+
 
     def optimize(self, algorithm='L-BFGS-B', ftol=1e-16, gtol=1e-16, max_iter=10000, maxfun=20000):
         return scipy.optimize.minimize(
@@ -162,7 +162,7 @@ class SUPG_grad_adjoint_method_solver(SUPG_solver):
             bounds=self._bounds,
             options={'ftol':ftol, 'gtol':gtol, 'maxiter':max_iter, 'maxfun':maxfun}
         )
-    
+
 
 class SUPG_grad_activation_solver(SUPG_grad_adjoint_method_solver):
     def __init__(self, pde_data, loss_form, t0):
@@ -173,8 +173,8 @@ class SUPG_grad_activation_solver(SUPG_grad_adjoint_method_solver):
 
     def loss(self):
         return self._loss_act(self._local_loss.x.array).sum()
-    
-    
+
+
     def grad(self):
         return self._loss_act.dx(self._local_loss.x.array)* self._grd.x.array
 
@@ -183,6 +183,3 @@ class SUPG_grad_activation_solver(SUPG_grad_adjoint_method_solver):
 SUPGSolver = SUPG_solver
 AdjointSUPGSolver = SUPG_grad_adjoint_method_solver
 ActivatedAdjointSUPGSolver = SUPG_grad_activation_solver
-
-
-        
