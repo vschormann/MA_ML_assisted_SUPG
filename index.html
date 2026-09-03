@@ -1,26 +1,208 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DOLFINx Function Gallery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Thesis progress and DOLFINx solution gallery for machine-learning-assisted SUPG stabilization.">
+<title>ML-assisted SUPG — Thesis Project</title>
 <style>
+:root {
+    color-scheme: light;
+    --ink: #17242c;
+    --muted: #60717b;
+    --paper: #f6f4ee;
+    --surface: #ffffff;
+    --line: #dce2df;
+    --accent: #126b61;
+    --accent-dark: #0b4d46;
+    --accent-soft: #dceee9;
+    --warm: #d88a45;
+    --shadow: 0 12px 35px rgba(23, 36, 44, 0.08);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+}
+a { color: inherit; }
+.page-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+.hero {
+    padding: 76px 0 64px;
+    color: white;
+    background:
+        radial-gradient(circle at 84% 12%, rgba(216, 138, 69, .28), transparent 24rem),
+        linear-gradient(135deg, #102d32 0%, #0c554f 100%);
+}
+.eyebrow {
+    margin: 0 0 14px;
+    color: #a8d8cf;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+.hero h1 { max-width: 850px; margin: 0; font-size: clamp(2.35rem, 6vw, 5rem); line-height: .98; letter-spacing: -.045em; }
+.hero-copy { max-width: 760px; margin: 24px 0 30px; color: #dbe9e6; font-size: clamp(1rem, 2vw, 1.2rem); }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 12px; }
+.badge, .hero-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 7px 14px;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px;
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.badge { border-color: #8cd2c4; color: #dff8f2; background: rgba(80, 180, 160, .15); }
+.badge::before { content: ""; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #76ddc8; }
+.hero-link:hover { background: rgba(255,255,255,.1); }
+main { padding: 52px 0 80px; }
+section + section { margin-top: 68px; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.section-heading .eyebrow { color: var(--accent); }
+.section-heading h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.5rem); letter-spacing: -.035em; }
+.section-heading p { max-width: 600px; margin: 5px 0 0; color: var(--muted); }
+.progress-card { padding: clamp(22px, 4vw, 40px); border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); }
+.progress-summary { display: flex; align-items: center; gap: 18px; margin-bottom: 30px; }
+.progress-number { font-size: 2rem; font-weight: 850; color: var(--accent-dark); }
+.progress-track { flex: 1; height: 10px; overflow: hidden; border-radius: 999px; background: var(--accent-soft); }
+.progress-track span { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), #52aa98); }
+.milestones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.milestone a { display: flex; height: 100%; gap: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; transition: border-color .2s, transform .2s; }
+.milestone a:hover { border-color: var(--accent); transform: translateY(-2px); }
+.check { display: grid; flex: 0 0 25px; height: 25px; place-items: center; border-radius: 50%; color: white; background: var(--accent); font-size: .8rem; }
+.milestone strong { display: block; font-size: .94rem; }
+.milestone small { color: var(--muted); }
+.chapter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.chapter-card { min-height: 210px; padding: 24px; border-top: 4px solid var(--accent); border-radius: 4px 4px 16px 16px; background: var(--surface); box-shadow: var(--shadow); }
+.chapter-card:nth-child(3) { border-color: var(--warm); }
+.chapter-card .number { color: var(--accent); font-size: .75rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.chapter-card h3 { margin: 12px 0 8px; font-size: 1.12rem; }
+.chapter-card p { margin: 0 0 16px; color: var(--muted); font-size: .92rem; }
+.chapter-card a { color: var(--accent-dark); font-weight: 750; text-underline-offset: 3px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-button { padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--surface); font: inherit; font-size: .9rem; font-weight: 750; cursor: pointer; }
+.filter-button:hover, .filter-button[aria-pressed="true"] { border-color: var(--accent); color: white; background: var(--accent); }
+:where(a, button):focus-visible { outline: 3px solid var(--warm); outline-offset: 3px; }
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 200px);
-    justify-content: center;
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 18px;
 }
+.card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 5px 18px rgba(23, 36, 44, .055);
+    transition: transform .2s, box-shadow .2s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.card a { display: block; }
+.card[hidden] { display: none; }
+.card p { margin: 0; padding: 11px 13px 13px; font-size: .9rem; font-weight: 700; }
+.card p::before { content: "Training case "; }
+.card[data-kind="test"] p::before { content: "Test case "; }
+.card[data-kind="test"] { border-color: #e2c4a7; }
+.card[data-kind="test"] p { color: #7b4a20; }
 .card img {
-    width: 200px;
+    display: block;
+    width: 100%;
     height: 150px;
-    object-fit: cover;  /* crops nicely */
-    border-radius: 8px;
+    object-fit: cover;
+}
+.footer { padding: 30px 0; color: #b9cdca; background: #102d32; font-size: .9rem; }
+.footer a { color: white; text-underline-offset: 3px; }
+@media (max-width: 900px) {
+    .milestones { grid-template-columns: repeat(2, 1fr); }
+    .chapter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+    .page-shell { width: min(100% - 24px, 1180px); }
+    .hero { padding: 52px 0 46px; }
+    main { padding-top: 38px; }
+    section + section { margin-top: 50px; }
+    .section-heading { display: block; }
+    .filters { margin-top: 18px; }
+    .milestones, .chapter-grid { grid-template-columns: 1fr; }
+    .progress-summary { align-items: flex-start; flex-direction: column; }
+    .progress-track { width: 100%; flex: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: .01ms !important; }
 }
 </style>
 </head>
 <body>
-<h1>DOLFINx Function Gallery</h1>
+<header class="hero">
+    <div class="page-shell">
+        <p class="eyebrow">Master's thesis · Computational science</p>
+        <h1>Machine-learning-assisted SUPG</h1>
+        <p class="hero-copy">Learning stabilization parameters for singularly perturbed convection–diffusion problems using finite-element solvers and graph neural networks.</p>
+        <div class="hero-meta">
+            <span class="badge">Thesis submitted</span>
+            <a class="hero-link" href="notebooks/README.md">View notebook workflow</a>
+            <a class="hero-link" href="docs/architecture.md">Explore architecture</a>
+        </div>
+    </div>
+</header>
+
+<main class="page-shell">
+<section aria-labelledby="progress-title">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Research journey</p>
+            <h2 id="progress-title">Thesis milestones</h2>
+            <p>The reproducible workflow follows the thesis argument from numerical objectives to final publication figures.</p>
+        </div>
+    </div>
+    <div class="progress-card">
+        <div class="progress-summary">
+            <span class="progress-number">9 / 9</span>
+            <div class="progress-track" role="progressbar" aria-label="Thesis workflow completion" aria-valuemin="0" aria-valuemax="9" aria-valuenow="9"><span></span></div>
+            <strong>Workflow complete</strong>
+        </div>
+        <ol class="milestones">
+            <li class="milestone"><a href="notebooks/01_supg_objectives.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>SUPG objectives</strong><small>Direct optimization</small></span></a></li>
+            <li class="milestone"><a href="notebooks/02_ch4_generate_dataset.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Original dataset</strong><small>Chapter 4</small></span></a></li>
+            <li class="milestone"><a href="notebooks/03_ch4_train_supervised.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Supervised training</strong><small>Architecture matrix</small></span></a></li>
+            <li class="milestone"><a href="notebooks/04_ch4_train_self_supervised.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Self-supervised training</strong><small>Adjoint-backed loss</small></span></a></li>
+            <li class="milestone"><a href="notebooks/05_ch4_evaluate_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Model evaluation</strong><small>Chapter 4 discussion</small></span></a></li>
+            <li class="milestone"><a href="notebooks/06_ch5_build_afc_target.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>AFC-BJK target</strong><small>Revised reference</small></span></a></li>
+            <li class="milestone"><a href="notebooks/07_ch5_train_revised_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Revised models</strong><small>MLP and GATv2</small></span></a></li>
+            <li class="milestone"><a href="notebooks/08_ch5_analyze_revised_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Revised analysis</strong><small>Perturbations and bounds</small></span></a></li>
+            <li class="milestone"><a href="notebooks/09_render_thesis_figures.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Publication figures</strong><small>Deterministic rendering</small></span></a></li>
+        </ol>
+    </div>
+</section>
+
+<section aria-labelledby="chapters-title">
+    <div class="section-heading"><div><p class="eyebrow">At a glance</p><h2 id="chapters-title">Research chapters</h2></div></div>
+    <div class="chapter-grid">
+        <article class="chapter-card"><span class="number">01 · Foundations</span><h3>Numerical objectives</h3><p>SUPG parameters, stabilized finite elements, objective functions, and direct optimization.</p><a href="notebooks/01_supg_objectives.ipynb">Open notebook</a></article>
+        <article class="chapter-card"><span class="number">02 · Chapter 4</span><h3>Initial ML approach</h3><p>Heterogeneous data with supervised and adjoint-backed architecture comparisons.</p><a href="notebooks/05_ch4_evaluate_models.ipynb">See evaluation</a></article>
+        <article class="chapter-card"><span class="number">03 · Chapter 5</span><h3>Revised target and models</h3><p>An AFC-BJK reference, revised learning target, and wider MLP and GATv2 models.</p><a href="notebooks/08_ch5_analyze_revised_models.ipynb">See analysis</a></article>
+        <article class="chapter-card"><span class="number">04 · Publication</span><h3>Evidence and figures</h3><p>Deterministic figure rendering and an interactive gallery of numerical cases.</p><a href="notebooks/09_render_thesis_figures.ipynb">View figure workflow</a></article>
+    </div>
+</section>
+
+<section aria-labelledby="gallery-title">
+<div class="section-heading">
+    <div><p class="eyebrow">Experimental evidence</p><h2 id="gallery-title">DOLFINx function gallery</h2><p id="gallery-summary">102 numerical cases: 88 training and 14 test examples.</p></div>
+    <div class="filters" role="group" aria-label="Filter gallery cases">
+        <button class="filter-button" type="button" data-filter="all" aria-pressed="true">All <span>102</span></button>
+        <button class="filter-button" type="button" data-filter="training" aria-pressed="false">Training <span>88</span></button>
+        <button class="filter-button" type="button" data-filter="test" aria-pressed="false">Test <span>14</span></button>
+    </div>
+</div>
 <div class="grid">
 
     <div class="card">
@@ -738,5 +920,46 @@
     </div>
     
 </div>
+</section>
+</main>
+
+<footer class="footer">
+    <div class="page-shell">Submitted thesis code and subsequent reproducibility-focused refactoring. See the <a href="readme.md">project README</a> for details.</div>
+</footer>
+
+<script>
+const galleryCards = [...document.querySelectorAll(".grid .card")];
+
+galleryCards.forEach((card) => {
+    const label = card.querySelector("p");
+    const image = card.querySelector("img");
+    const isTest = label.textContent.trim().startsWith("test_");
+    const caseNumber = label.textContent.match(/\d+$/)?.[0] ?? label.textContent.trim();
+
+    card.dataset.kind = isTest ? "test" : "training";
+    label.textContent = caseNumber;
+    image.alt = `${isTest ? "Test" : "Training"} case ${caseNumber} DOLFINx solution`;
+    image.loading = "lazy";
+    image.decoding = "async";
+});
+
+document.querySelectorAll(".filter-button").forEach((button) => {
+    button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
+        let visible = 0;
+
+        document.querySelectorAll(".filter-button").forEach((item) => {
+            item.setAttribute("aria-pressed", String(item === button));
+        });
+        galleryCards.forEach((card) => {
+            const show = filter === "all" || card.dataset.kind === filter;
+            card.hidden = !show;
+            if (show) visible += 1;
+        });
+        const names = { all: "numerical", training: "training", test: "test" };
+        document.querySelector("#gallery-summary").textContent = `${visible} ${names[filter]} ${visible === 1 ? "case" : "cases"}.`;
+    });
+});
+</script>
 </body>
 </html>
