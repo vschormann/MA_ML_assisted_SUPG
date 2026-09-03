@@ -87,6 +87,9 @@ section + section { margin-top: 68px; }
 .chapter-card h3 { margin: 12px 0 8px; font-size: 1.12rem; }
 .chapter-card p { margin: 0 0 16px; color: var(--muted); font-size: .92rem; }
 .chapter-card a { color: var(--accent-dark); font-weight: 750; text-underline-offset: 3px; }
+.result-figure { margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
+.result-figure img { display: block; width: 100%; background: white; }
+.result-figure figcaption { padding: 16px 20px; color: var(--muted); }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .filter-button { padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--surface); font: inherit; font-size: .9rem; font-weight: 750; cursor: pointer; }
 .filter-button:hover, .filter-button[aria-pressed="true"] { border-color: var(--accent); color: white; background: var(--accent); }
@@ -149,8 +152,8 @@ section + section { margin-top: 68px; }
         <p class="hero-copy">Learning stabilization parameters for singularly perturbed convection–diffusion problems using finite-element solvers and graph neural networks.</p>
         <div class="hero-meta">
             <span class="badge">Thesis submitted</span>
-            <a class="hero-link" href="notebooks/README.md">View notebook workflow</a>
-            <a class="hero-link" href="docs/architecture.md">Explore architecture</a>
+            <a class="hero-link" href="docs/rendered-notebooks/index.html">Read rendered notebooks</a>
+            <a class="hero-link" href="#chapters-title">Explore workflow</a>
         </div>
     </div>
 </header>
@@ -171,15 +174,15 @@ section + section { margin-top: 68px; }
             <strong>Workflow complete</strong>
         </div>
         <ol class="milestones">
-            <li class="milestone"><a href="notebooks/01_supg_objectives.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>SUPG objectives</strong><small>Direct optimization</small></span></a></li>
-            <li class="milestone"><a href="notebooks/02_ch4_generate_dataset.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Original dataset</strong><small>Chapter 4</small></span></a></li>
-            <li class="milestone"><a href="notebooks/03_ch4_train_supervised.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Supervised training</strong><small>Architecture matrix</small></span></a></li>
-            <li class="milestone"><a href="notebooks/04_ch4_train_self_supervised.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Self-supervised training</strong><small>Adjoint-backed loss</small></span></a></li>
-            <li class="milestone"><a href="notebooks/05_ch4_evaluate_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Model evaluation</strong><small>Chapter 4 discussion</small></span></a></li>
-            <li class="milestone"><a href="notebooks/06_ch5_build_afc_target.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>AFC-BJK target</strong><small>Revised reference</small></span></a></li>
-            <li class="milestone"><a href="notebooks/07_ch5_train_revised_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Revised models</strong><small>MLP and GATv2</small></span></a></li>
-            <li class="milestone"><a href="notebooks/08_ch5_analyze_revised_models.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Revised analysis</strong><small>Perturbations and bounds</small></span></a></li>
-            <li class="milestone"><a href="notebooks/09_render_thesis_figures.ipynb"><span class="check" aria-hidden="true">✓</span><span><strong>Publication figures</strong><small>Deterministic rendering</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/01_supg_objectives.html"><span class="check" aria-hidden="true">✓</span><span><strong>SUPG objectives</strong><small>Direct optimization</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/02_ch4_generate_dataset.html"><span class="check" aria-hidden="true">✓</span><span><strong>Original dataset</strong><small>Chapter 4</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/03_ch4_train_supervised.html"><span class="check" aria-hidden="true">✓</span><span><strong>Supervised training</strong><small>Architecture matrix</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/04_ch4_train_self_supervised.html"><span class="check" aria-hidden="true">✓</span><span><strong>Self-supervised training</strong><small>Adjoint-backed loss</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/05_ch4_evaluate_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Model evaluation</strong><small>Chapter 4 discussion</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/06_ch5_build_afc_target.html"><span class="check" aria-hidden="true">✓</span><span><strong>AFC-BJK target</strong><small>Revised reference</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/07_ch5_train_revised_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Revised models</strong><small>MLP and GATv2</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Revised analysis</strong><small>Perturbations and bounds</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/09_render_thesis_figures.html"><span class="check" aria-hidden="true">✓</span><span><strong>Publication figures</strong><small>Deterministic rendering</small></span></a></li>
         </ol>
     </div>
 </section>
@@ -187,11 +190,19 @@ section + section { margin-top: 68px; }
 <section aria-labelledby="chapters-title">
     <div class="section-heading"><div><p class="eyebrow">At a glance</p><h2 id="chapters-title">Research chapters</h2></div></div>
     <div class="chapter-grid">
-        <article class="chapter-card"><span class="number">01 · Foundations</span><h3>Numerical objectives</h3><p>SUPG parameters, stabilized finite elements, objective functions, and direct optimization.</p><a href="notebooks/01_supg_objectives.ipynb">Open notebook</a></article>
-        <article class="chapter-card"><span class="number">02 · Chapter 4</span><h3>Initial ML approach</h3><p>Heterogeneous data with supervised and adjoint-backed architecture comparisons.</p><a href="notebooks/05_ch4_evaluate_models.ipynb">See evaluation</a></article>
-        <article class="chapter-card"><span class="number">03 · Chapter 5</span><h3>Revised target and models</h3><p>An AFC-BJK reference, revised learning target, and wider MLP and GATv2 models.</p><a href="notebooks/08_ch5_analyze_revised_models.ipynb">See analysis</a></article>
-        <article class="chapter-card"><span class="number">04 · Publication</span><h3>Evidence and figures</h3><p>Deterministic figure rendering and an interactive gallery of numerical cases.</p><a href="notebooks/09_render_thesis_figures.ipynb">View figure workflow</a></article>
+        <article class="chapter-card"><span class="number">01 · Foundations</span><h3>Numerical objectives</h3><p>SUPG parameters, stabilized finite elements, objective functions, and direct optimization.</p><a href="docs/rendered-notebooks/01_supg_objectives.html">Read notebook</a></article>
+        <article class="chapter-card"><span class="number">02 · Chapter 4</span><h3>Initial ML approach</h3><p>Heterogeneous data with supervised and adjoint-backed architecture comparisons.</p><a href="docs/rendered-notebooks/05_ch4_evaluate_models.html">Read evaluation</a></article>
+        <article class="chapter-card"><span class="number">03 · Chapter 5</span><h3>Revised target and models</h3><p>An AFC-BJK reference, revised learning target, and wider MLP and GATv2 models.</p><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html">Read analysis</a></article>
+        <article class="chapter-card"><span class="number">04 · Publication</span><h3>Evidence and figures</h3><p>Deterministic figure rendering and an interactive gallery of numerical cases.</p><a href="docs/rendered-notebooks/09_render_thesis_figures.html">Read figure workflow</a></article>
     </div>
+</section>
+
+<section aria-labelledby="comparison-title">
+    <div class="section-heading"><div><p class="eyebrow">Chapter 5</p><h2 id="comparison-title">AFC-BJK reference comparison</h2><p>Outflow and crosswind line cuts compare the robust AFC-BJK reference with optimized and learned SUPG solutions.</p></div></div>
+    <figure class="result-figure">
+        <img src="docs/assets/thesis-figures/revised_results_lineplots.png" alt="Outflow and crosswind line plots comparing AFC-BJK, optimized SUPG, MLP, and GATv2 solutions">
+        <figcaption>Historical thesis figure export. It provides orientation for the revised study; the rendered Chapter 5 notebooks explain the target, training, and limitations.</figcaption>
+    </figure>
 </section>
 
 <section aria-labelledby="gallery-title">
@@ -924,7 +935,7 @@ section + section { margin-top: 68px; }
 </main>
 
 <footer class="footer">
-    <div class="page-shell">Submitted thesis code and subsequent reproducibility-focused refactoring. See the <a href="readme.md">project README</a> for details.</div>
+    <div class="page-shell">Submitted thesis code and subsequent reproducibility-focused refactoring. See the <a href="https://github.com/vschormann/MA_ML_assisted_SUPG#readme">project README</a> for details.</div>
 </footer>
 
 <script>

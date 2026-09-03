@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SUPG-ML — rendered notebooks</title>
+  <style>
+    :root { --ink:#17242c; --muted:#60717b; --paper:#f6f4ee; --surface:#fff; --accent:#126b61; --line:#dce2df; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    header { padding:64px 24px 54px; color:#fff; background:linear-gradient(135deg,#102d32,#0c554f); }
+    main, header > div { width:min(960px,calc(100% - 40px)); margin:auto; }
+    h1 { margin:0; font-size:clamp(2.2rem,6vw,4.2rem); line-height:1; letter-spacing:-.04em; }
+    header p { max-width:720px; color:#dbe9e6; font-size:1.1rem; }
+    main { padding:48px 0 72px; }
+    .notice { padding:16px 20px; border-left:4px solid var(--accent); border-radius:8px; background:#e7f2ef; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-top:28px; }
+    a.card { display:block; min-height:154px; padding:22px; border:1px solid var(--line); border-radius:14px; color:inherit; background:var(--surface); text-decoration:none; box-shadow:0 5px 18px rgba(23,36,44,.055); transition:transform .15s,border-color .15s; }
+    a.card:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .number { color:var(--accent); font-size:.78rem; font-weight:800; letter-spacing:.12em; }
+    h2 { margin:10px 0 6px; font-size:1.18rem; }
+    .card p { margin:0; color:var(--muted); }
+    footer { padding:26px 24px; color:#c5d7d4; background:#102d32; }
+    footer div { width:min(960px,calc(100% - 40px)); margin:auto; }
+    footer a { color:#fff; }
+  </style>
+</head>
+<body>
+  <header><div>
+    <p>Machine-learning-assisted SUPG</p>
+    <h1>Rendered notebooks</h1>
+    <p>Read the canonical thesis workflow in Safari or any browser. These are static HTML snapshots; no Jupyter kernel is required.</p>
+  </div></header>
+  <main>
+    <div class="notice"><strong>Looking for executable notebooks?</strong> The corresponding <code>.ipynb</code> files remain in the repository. These HTML files are the browser-readable versions.</div>
+    <div class="grid">
+      <a class="card" href="01_supg_objectives.html"><span class="number">01 · FOUNDATIONS</span><h2>SUPG objectives</h2><p>FEM setup, stabilization, objective, and discrete adjoint.</p></a>
+      <a class="card" href="02_ch4_generate_dataset.html"><span class="number">02 · CHAPTER 4</span><h2>Generate dataset</h2><p>FEM cases, graph schema, and validation.</p></a>
+      <a class="card" href="03_ch4_train_supervised.html"><span class="number">03 · CHAPTER 4</span><h2>Supervised training</h2><p>Common task for the architecture comparison.</p></a>
+      <a class="card" href="04_ch4_train_self_supervised.html"><span class="number">04 · CHAPTER 4</span><h2>FEM-backed training</h2><p>PyTorch/FEniCSx adjoint-gradient bridge.</p></a>
+      <a class="card" href="05_ch4_evaluate_models.html"><span class="number">05 · CHAPTER 4</span><h2>Evaluate models</h2><p>Parameter error and FEM-solution quality.</p></a>
+      <a class="card" href="06_ch5_build_afc_target.html"><span class="number">06 · CHAPTER 5</span><h2>Build AFC-BJK target</h2><p>Revised SPDE and reference solution.</p></a>
+      <a class="card" href="07_ch5_train_revised_models.html"><span class="number">07 · CHAPTER 5</span><h2>Train revised models</h2><p>Revised MLP/GATv2 model selection.</p></a>
+      <a class="card" href="08_ch5_analyze_revised_models.html"><span class="number">08 · CHAPTER 5</span><h2>Analyse revised models</h2><p>Target ambiguity and non-local information.</p></a>
+      <a class="card" href="09_render_thesis_figures.html"><span class="number">09 · REPORTING</span><h2>Render figures</h2><p>Read-only figure provenance and reporting.</p></a>
+    </div>
+  </main>
+  <footer><div><a href="../../index.html">← Project home</a></div></footer>
+</body>
+</html>
