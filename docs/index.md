@@ -9,15 +9,18 @@ singularly perturbed convection–diffusion problems.
 The repository is best read as a short scientific workflow, not as a collection
 of unrelated notebooks:
 
-1. **Define and stabilize a PDE.** Notebook 01 shows the mesh, finite-element
-   spaces, weak form, cellwise SUPG parameter, objective, and discrete adjoint.
-2. **Create graph learning cases.** Notebook 02 maps FEM cells and fields to a
-   documented graph schema, with optimized cellwise parameters as targets.
-3. **Compare Chapter 4 models.** Notebooks 03–05 compare MLP, GCN, GraphSAGE,
-   GAT, and GATv2 using supervised and adjoint-backed objectives.
-4. **Follow the Chapter 5 revision.** Notebooks 06–08 replace the reference
-   solution with AFC-BJK, train the revised MLP/GATv2 models, and assess target
-   ambiguity and non-local information.
+1. **[Define and stabilize a PDE](tutorials/supg.md).** Notebook 01 shows the
+   mesh, finite-element spaces, weak form, cellwise SUPG parameter, objective,
+   and discrete adjoint.
+2. **[Create graph learning cases](tutorials/graphs.md).** Notebook 02 maps FEM
+   cells and fields to a documented graph schema, with optimized cellwise
+   parameters as targets.
+3. **[Compare Chapter 4 models](tutorials/learning.md).** Notebooks 03–05
+   compare MLP, GCN, GraphSAGE, GAT, and GATv2 using supervised and
+   adjoint-backed objectives.
+4. **[Follow the Chapter 5 revision](tutorials/revised-study.md).** Notebooks
+   06–08 replace the reference solution with AFC-BJK, train the revised
+   MLP/GATv2 models, and assess target ambiguity and non-local information.
 5. **Regenerate reported figures.** Notebook 09 is a read-only reporting step
    with explicit figure provenance.
 
