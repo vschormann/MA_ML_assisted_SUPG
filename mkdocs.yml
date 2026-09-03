@@ -13,6 +13,7 @@ nav:
       - Architecture: architecture.md
       - Notebook map: notebooks.md
       - Rendered notebooks: rendered-notebooks.md
+      - Thesis figure archive: figure-archive.md
       - API: api.md
   - Refactoring: refactoring.md
   - Migration: migration.md

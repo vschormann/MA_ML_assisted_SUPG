@@ -28,6 +28,18 @@ See the [canonical notebook sequence](notebooks.md) for the full map and the
 repository's `notebooks/README.md` for execution order. For browser-only
 reading, open the [rendered notebook collection](rendered-notebooks.md).
 
+## A representative thesis comparison
+
+The Chapter 5 workflow compares the AFC-BJK reference with optimized and
+model-predicted SUPG solutions along outflow and crosswind line cuts. The close
+agreement visible below motivates the revised study, while notebook 08 provides
+the necessary qualification about target ambiguity and residual artefacts.
+
+![AFC-BJK, optimized SUPG, revised MLP, and revised GATv2 line comparisons](assets/thesis-figures/revised_results_lineplots.png)
+
+*Historical thesis figure export, retained as an archived artefact. It is shown
+for orientation and is not a new result produced by this refactoring.*
+
 ## What belongs where
 
 The notebooks retain the scientific choices: SPDE definitions, boundary data,
