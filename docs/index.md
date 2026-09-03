@@ -25,7 +25,8 @@ of unrelated notebooks:
    with explicit figure provenance.
 
 See the [canonical notebook sequence](notebooks.md) for the full map and the
-repository's `notebooks/README.md` for execution order.
+repository's `notebooks/README.md` for execution order. For browser-only
+reading, open the [rendered notebook collection](rendered-notebooks.md).
 
 ## What belongs where
 

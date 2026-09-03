@@ -12,6 +12,7 @@ nav:
   - Reference:
       - Architecture: architecture.md
       - Notebook map: notebooks.md
+      - Rendered notebooks: rendered-notebooks.md
       - API: api.md
   - Refactoring: refactoring.md
   - Migration: migration.md
