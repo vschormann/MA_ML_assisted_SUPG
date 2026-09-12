@@ -7553,13 +7553,25 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=capacity">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-Match-the-revised-model-capacity">2. Match the revised model capacity<a class="anchor-link" href="#2.-Match-the-revised-model-capacity">¶</a></h2><p>The revised MLP follows the wide block structure described in Section 5.1.3, with layers up to width 256. Revised GATv2 uses four 256-channel graph-attention layers followed by the same two prediction heads. Because this experiment is restricted to triangular meshes, it uses nine features and omits the Chapter 4 cell-type indicator.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=selection">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The full FEM comparison is sampled periodically because it entails a state and adjoint solve. Cosine warm restarts schedule the optimizer, and the best saved model is the one with the lowest sampled FEM loss against the AFC-BJK target.</p>
+<h2 id="3.-Select-through-the-PDE">3. Select through the PDE<a class="anchor-link" href="#3.-Select-through-the-PDE">¶</a></h2><p>The full FEM comparison is sampled periodically because it entails a state and adjoint solve. Cosine warm restarts schedule the optimizer, and the best saved model is the one with the lowest sampled FEM loss against the AFC-BJK target. The thesis ran MLP for 200,000 epochs and the more expensive GATv2 for 150,000; <code>epochs_by_architecture</code> records that asymmetry explicitly.</p>
+<p><strong>Provenance note:</strong> Equation (28) in the thesis prints a <code>0.01</code> learning-rate prefactor, while both submitted <code>Train_revised*.ipynb</code> notebooks initialize Adam with <code>lr=1e-3</code>. The canonical configuration follows the executed notebooks and records <code>0.001</code>.</p>
 </div>
 </div>
 </div>

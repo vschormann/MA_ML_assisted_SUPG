@@ -15,14 +15,15 @@ of unrelated notebooks:
 2. **[Create graph learning cases](tutorials/graphs.md).** Notebook 02 maps FEM
    cells and fields to a documented graph schema, with optimized cellwise
    parameters as targets.
-3. **[Compare Chapter 4 models](tutorials/learning.md).** Notebooks 03–05
+3. **[Compare the thesis models](tutorials/learning.md).** Notebooks 03–05
    compare MLP, GCN, GraphSAGE, GAT, and GATv2 using supervised and
    adjoint-backed objectives.
-4. **[Follow the Chapter 5 revision](tutorials/revised-study.md).** Notebooks
-   06–08 replace the reference solution with AFC-BJK, train the revised
-   MLP/GATv2 models, and assess target ambiguity and non-local information.
-5. **Regenerate reported figures.** Notebook 09 is a read-only reporting step
-   with explicit figure provenance.
+4. **[Read the results and research path](results.md).** This concise account
+   restores the experimental findings and negative results preserved by the
+   submitted notebooks.
+5. **[Follow the Chapter 5 revision](tutorials/revised-study.md).**
+   Notebooks 06–09 introduce the AFC-BJK reference, revised models,
+   target-ambiguity analysis, and deterministic figure rendering.
 
 ### Read the notebooks in a browser
 
@@ -34,9 +35,9 @@ executable sources; the HTML pages are the browser-reading version.
 The [canonical notebook map](notebooks.md) explains their thesis roles, and
 `notebooks/README.md` records the execution order.
 
-## A representative thesis comparison
+## A representative Chapter 5 comparison
 
-The Chapter 5 workflow compares the AFC-BJK reference with optimized and
+The Chapter 5 AFC-BJK workflow compares its reference with optimized and
 model-predicted SUPG solutions along outflow and crosswind line cuts. The close
 agreement visible below motivates the revised study, while notebook 08 provides
 the necessary qualification about target ambiguity and residual artefacts.
@@ -63,8 +64,8 @@ of numerical infrastructure.
 | Goal | Begin with | Main package areas |
 | --- | --- | --- |
 | Understand SUPG and the adjoint | Notebook 01 | `supgml.supg`, `supgml.fem`, `supgml.stabilization` |
-| Recreate Chapter 4 data/models | Notebooks 02–05 | `supgml.graph`, `supgml.data`, `supgml.models`, `supgml.training` |
-| Recreate the revised study | Notebooks 06–08 | `supgml.stabilization`, `supgml.autograd`, `supgml.experiments` |
+| Recreate the submitted thesis study | Notebooks 02–05 | `supgml.graph`, `supgml.data`, `supgml.models`, `supgml.training` |
+| Recreate the Chapter 5 study | Notebooks 06–08 | `supgml.stabilization`, `supgml.autograd`, `supgml.experiments` |
 | Reuse a component in new work | [API guide](api.md) | the relevant `supgml.*` subpackage |
 
 ## Installation and provenance

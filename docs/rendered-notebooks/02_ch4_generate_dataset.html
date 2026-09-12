@@ -7529,7 +7529,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Specify-the-experimental-matrix">1. Specify the experimental matrix<a class="anchor-link" href="#1.-Specify-the-experimental-matrix">¶</a></h2><p>The submitted study used 88 training and 14 test cases. Record benchmark name, mesh resolution, polynomial order, and split in a small, reviewable table; do not encode them implicitly in copied training notebooks.</p>
+<h2 id="1.-Specify-the-experimental-matrix">1. Specify the experimental matrix<a class="anchor-link" href="#1.-Specify-the-experimental-matrix">¶</a></h2><p>The submitted study used <strong>seven benchmark families</strong>, 88 training cases, and 14 test cases. Cases mix triangular and quadrilateral meshes, regular aspect-ratio sweeps, and randomly sized test meshes (30–45 cells per direction). The table below replaces the opaque integer IDs used by the submitted generator.</p>
 </div>
 </div>
 </div>
@@ -7541,14 +7541,16 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">training_cases</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"benchmark"</span><span class="p">:</span> <span class="s2">"wedge"</span><span class="p">,</span> <span class="s2">"nx"</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">"ny"</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">"split"</span><span class="p">:</span> <span class="s2">"train"</span><span class="p">},</span>
-    <span class="c1"># Add the remaining thesis cases here, preserving their recorded IDs.</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">benchmark_families</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"wedge"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"crosswind residual"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"bump"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"crosswind residual"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"lifted-edge"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"L2 error (exact solution)"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"cylinder"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"L2 error (exact solution)"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"falloff"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"crosswind residual"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"curved-wave"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"limited residual, t0=0.03"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"legacy_id"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"spde"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"curved-waves"</span><span class="p">,</span> <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"limited residual, t0=1"</span><span class="p">},</span>
 <span class="p">]</span>
-<span class="n">test_cases</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"benchmark"</span><span class="p">:</span> <span class="s2">"wedge"</span><span class="p">,</span> <span class="s2">"nx"</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="s2">"ny"</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="s2">"split"</span><span class="p">:</span> <span class="s2">"test"</span><span class="p">},</span>
-<span class="p">]</span>
-<span class="nb">len</span><span class="p">(</span><span class="n">training_cases</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_cases</span><span class="p">)</span>
+<span class="n">benchmark_families</span>
 </pre></div>
 </div>
 </div>
@@ -7590,13 +7592,24 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=optimization-cost">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-Generate-expensive-targets-once">3. Generate expensive targets once<a class="anchor-link" href="#3.-Generate-expensive-targets-once">¶</a></h2><p>Each target is the result of a bounded L-BFGS-B optimization using the discrete-adjoint gradient. This is the computational bottleneck: the thesis reports about 12,000 iterations for SPDE 3 on a 64×8 quadrilateral mesh, while some triangular cases had still not converged after more than one million iterations. Saving the solver state, target, mesh identity, and objective name together is therefore part of reproducibility, not just caching.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=validation">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3.-Validate-before-training">3. Validate before training<a class="anchor-link" href="#3.-Validate-before-training">¶</a></h2><p>Check case count, feature names/order, target and upper-bound shapes, mesh/problem IDs, and graph connectivity. <code>GraphBuilder</code> and <code>CaseRepository</code> package the stable schema and persistence; this notebook documents why each case exists.</p>
+<h2 id="4.-Validate-before-training">4. Validate before training<a class="anchor-link" href="#4.-Validate-before-training">¶</a></h2><p>Check the 88/14 split, feature names/order, target and upper-bound shapes, mesh/problem IDs, and graph connectivity. <code>GraphBuilder</code> and <code>CaseRepository</code> package the stable schema and persistence; this notebook documents why each case exists. The submitted implementation is retained in <code>archive/prototypes/data_generation.ipynb</code> for audit, including its original integer IDs and nested adjacency loop.</p>
 </div>
 </div>
 </div>

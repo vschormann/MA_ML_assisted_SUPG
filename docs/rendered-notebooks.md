@@ -10,9 +10,9 @@ experiment.
 | --- | --- | --- |
 | 01 | [SUPG objectives](rendered-notebooks/01_supg_objectives.html) | FEM setup, SUPG form, and discrete adjoint |
 | 02 | [Chapter 4 data generation](rendered-notebooks/02_ch4_generate_dataset.html) | FEM cases, graph schema, and validation |
-| 03 | [Chapter 4 supervised training](rendered-notebooks/03_ch4_train_supervised.html) | Common architecture-comparison task |
-| 04 | [Chapter 4 FEM-backed training](rendered-notebooks/04_ch4_train_self_supervised.html) | PyTorch/FEniCSx adjoint bridge |
-| 05 | [Chapter 4 evaluation](rendered-notebooks/05_ch4_evaluate_models.html) | Parameter and FEM-solution comparison |
+| 03 | [Chapter 4 supervised training](rendered-notebooks/03_ch4_train_supervised.html) | Thesis architecture comparison and observed failures |
+| 04 | [Chapter 4 FEM-backed training](rendered-notebooks/04_ch4_train_self_supervised.html) | Thesis adjoint bridge and reported outcome |
+| 05 | [Chapter 4 evaluation](rendered-notebooks/05_ch4_evaluate_models.html) | Thesis evidence, limitations, and conclusion |
 | 06 | [Chapter 5 AFC-BJK target](rendered-notebooks/06_ch5_build_afc_target.html) | Revised SPDE and reference solution |
 | 07 | [Chapter 5 revised training](rendered-notebooks/07_ch5_train_revised_models.html) | Revised MLP/GATv2 selection |
 | 08 | [Chapter 5 analysis](rendered-notebooks/08_ch5_analyze_revised_models.html) | Target ambiguity and model interpretation |

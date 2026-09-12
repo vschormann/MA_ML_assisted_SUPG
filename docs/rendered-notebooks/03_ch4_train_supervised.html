@@ -7581,13 +7581,35 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=architecture-search">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-Keep-the-unsuccessful-search-visible">2. Keep the unsuccessful search visible<a class="anchor-link" href="#2.-Keep-the-unsuccessful-search-visible">¶</a></h2><p>The first 64-32-32 architecture, adapted from ConvStabNet, did not produce useful solutions for any model. A narrow, deeper design—eight hidden layers of width five in the thesis account—worked better. This negative result is scientifically important: the final architecture was not an arbitrary default, and larger layers did not compensate for the small heterogeneous dataset.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=observed-result">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-What-the-supervised-experiment-showed">3. What the supervised experiment showed<a class="anchor-link" href="#3.-What-the-supervised-experiment-showed">¶</a></h2><p>In the small, heterogeneous Chapter 4 setup, direct parameter regression did not consistently produce satisfactory FEM solutions. Similar target errors could have very different physical consequences, and loss scales varied substantially between problems. This failure motivates both the FEM-backed comparison and Chapter 5’s more robust common reference objective.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=run">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Run <code>supgml-train experiments/ch4_supervised.json</code> from the repository root. The runner fixes split, seed, optimizer, and output directory across MLP/GCN/GraphSAGE/GAT/GATv2; inspect its recorded history rather than comparing notebook-cell output.</p>
+<p>Run <code>supgml-train experiments/ch4_supervised.json</code> from the repository root. The runner fixes split, seed, optimizer, and output directory across MLP/GCN/GraphSAGE/GAT/GATv2; inspect its recorded history rather than comparing notebook-cell output. The long submitted traces remain in <code>archive/chapter4/Train_*.ipynb</code> as evidence, not tutorial content.</p>
 </div>
 </div>
 </div>

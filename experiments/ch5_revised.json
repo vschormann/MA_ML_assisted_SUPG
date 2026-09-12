@@ -8,6 +8,10 @@
   "node_mask": "interior_dofs",
   "mode": "supervised",
   "epochs": 200000,
+  "epochs_by_architecture": {
+    "revised-mlp": 200000,
+    "revised-gatv2": 150000
+  },
   "batch_size": 1024,
   "learning_rate": 0.001,
   "scheduler": {"name": "cosine-warm-restarts", "t0": 50, "tmult": 2},

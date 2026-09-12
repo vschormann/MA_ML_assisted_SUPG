@@ -15,10 +15,10 @@ notebooks 03-05 and the two Chapter 4 configuration files.
 ## `chapter5_revised`
 
 The combined numerical-method/data-generation notebook, separate revised MLP
-and GATv2 training notebooks, and final analysis. These are reported experiments
-and are consolidated by canonical notebooks 06-08. `Train_revised copy.ipynb`
-is specifically the revised GATv2 experiment; its old name is retained so the
-submitted artifact remains recognizable.
+and GATv2 training notebooks, and final analysis. These reported Chapter 5
+experiments are consolidated by canonical notebooks 06-08. `Train_revised
+copy.ipynb` is specifically the revised GATv2 experiment; its old name is
+retained for provenance.
 
 ## `prototypes`
 

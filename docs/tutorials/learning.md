@@ -41,4 +41,9 @@ Validate every new FEM objective against finite differences. Run the documented
 experiment matrices with `supgml-train experiments/ch4_supervised.json` and
 `supgml-train experiments/ch4_self_supervised.json`.
 
-Continue with [Tutorial 4](revised-study.md) for the Chapter 5 revision.
+The reported outcome was mixed: the local MLP produced the best individual
+results but more unusable predictions, while GATv2 produced fewer unusable
+predictions and generalized best. See the [results narrative](../results.md)
+before reading individual training traces.
+
+Continue with [Tutorial 4](revised-study.md) for the Chapter 5 AFC-BJK study.

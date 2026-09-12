@@ -7584,13 +7584,24 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=observed-result">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="What-the-architecture-comparison-showed">What the architecture comparison showed<a class="anchor-link" href="#What-the-architecture-comparison-showed">¶</a></h2><p>The local MLP produced the best result on several individual problems, but it also produced more unusable predictions. GATv2 was not always the winner, yet it yielded fewer unusable cases and the best overall generalization. GCN, GraphSAGE, and GAT were harder to fit and appeared more prone to overfitting. The evidence therefore supports adjacent-cell information as useful without claiming that message passing wins every case.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=run">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Run from the repository root with <code>supgml-train experiments/ch4_self_supervised.json</code> inside the supported DOLFINx environment. The batch size remains one because each graph invokes its corresponding state-and-adjoint FEM solver. The command stores checkpoints and loss histories under <code>runs/ch4_self_supervised</code>.</p>
+<p>Run from the repository root with <code>supgml-train experiments/ch4_self_supervised.json</code> inside the supported DOLFINx environment. The batch size remains one because each graph invokes its corresponding state-and-adjoint FEM solver. The command stores checkpoints and loss histories under <code>runs/ch4_self_supervised</code>; submitted traces are retained in <code>archive/chapter4/*_self_supervised.ipynb</code>.</p>
 </div>
 </div>
 </div>

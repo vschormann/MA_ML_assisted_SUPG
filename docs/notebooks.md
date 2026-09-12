@@ -1,6 +1,6 @@
 # Notebook map
 
-Nine ordered notebooks under `notebooks/` now follow the thesis argument.
+Nine ordered notebooks under `notebooks/` follow the thesis argument.
 Reusable definitions have a canonical home in `supgml`; all 32 submitted
 notebooks and their outputs are retained under `notebooks/archive/`.
 
@@ -10,11 +10,11 @@ The canonical sequence is:
 2. Chapter 4 dataset generation;
 3. Chapter 4 supervised architecture comparison;
 4. Chapter 4 self-supervised architecture comparison;
-5. Chapter 4 evaluation;
+5. Chapter 4 evaluation and discussion;
 6. Chapter 5 AFC-BJK target construction;
 7. Chapter 5 revised MLP/GATv2 training;
-8. Chapter 5 revised-model analysis; and
-9. deterministic thesis-figure rendering.
+8. Chapter 5 perturbation and revised-model analysis; and
+9. deterministic research-figure rendering.
 
 ## Data preparation
 
@@ -67,3 +67,6 @@ adjoint gradient. The canonical implementation is in `supgml.autograd` and
 Do not edit an archived submitted notebook in place. Extend a canonical
 notebook or create a new configuration-driven experiment, keeping regenerated
 scientific output separate from the archived evidence.
+
+For the concise interpretation that connects these notebooks, read
+[Results and research path](results.md).

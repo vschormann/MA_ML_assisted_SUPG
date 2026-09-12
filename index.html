@@ -152,6 +152,7 @@ section + section { margin-top: 68px; }
         <p class="hero-copy">Learning stabilization parameters for singularly perturbed convection–diffusion problems using finite-element solvers and graph neural networks.</p>
         <div class="hero-meta">
             <span class="badge">Thesis submitted</span>
+            <a class="hero-link" href="site/results/">Read results</a>
             <a class="hero-link" href="docs/rendered-notebooks/index.html">Read rendered notebooks</a>
             <a class="hero-link" href="#chapters-title">Explore workflow</a>
         </div>
@@ -163,14 +164,14 @@ section + section { margin-top: 68px; }
     <div class="section-heading">
         <div>
             <p class="eyebrow">Research journey</p>
-            <h2 id="progress-title">Thesis milestones</h2>
-            <p>The reproducible workflow follows the thesis argument from numerical objectives to final publication figures.</p>
+            <h2 id="progress-title">Research milestones</h2>
+            <p>The reproducible workflow follows the submitted thesis from numerical objectives through the revised Chapter 5 study and publication figures.</p>
         </div>
     </div>
     <div class="progress-card">
         <div class="progress-summary">
             <span class="progress-number">9 / 9</span>
-            <div class="progress-track" role="progressbar" aria-label="Thesis workflow completion" aria-valuemin="0" aria-valuemax="9" aria-valuenow="9"><span></span></div>
+            <div class="progress-track" role="progressbar" aria-label="Documented thesis workflow" aria-valuemin="0" aria-valuemax="9" aria-valuenow="9"><span></span></div>
             <strong>Workflow complete</strong>
         </div>
         <ol class="milestones">
@@ -179,29 +180,37 @@ section + section { margin-top: 68px; }
             <li class="milestone"><a href="docs/rendered-notebooks/03_ch4_train_supervised.html"><span class="check" aria-hidden="true">✓</span><span><strong>Supervised training</strong><small>Architecture matrix</small></span></a></li>
             <li class="milestone"><a href="docs/rendered-notebooks/04_ch4_train_self_supervised.html"><span class="check" aria-hidden="true">✓</span><span><strong>Self-supervised training</strong><small>Adjoint-backed loss</small></span></a></li>
             <li class="milestone"><a href="docs/rendered-notebooks/05_ch4_evaluate_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Model evaluation</strong><small>Chapter 4 discussion</small></span></a></li>
-            <li class="milestone"><a href="docs/rendered-notebooks/06_ch5_build_afc_target.html"><span class="check" aria-hidden="true">✓</span><span><strong>AFC-BJK target</strong><small>Revised reference</small></span></a></li>
-            <li class="milestone"><a href="docs/rendered-notebooks/07_ch5_train_revised_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Revised models</strong><small>MLP and GATv2</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/06_ch5_build_afc_target.html"><span class="check" aria-hidden="true">✓</span><span><strong>AFC-BJK target</strong><small>Chapter 5 reference</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/07_ch5_train_revised_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Revised models</strong><small>Chapter 5 MLP and GATv2</small></span></a></li>
             <li class="milestone"><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html"><span class="check" aria-hidden="true">✓</span><span><strong>Revised analysis</strong><small>Perturbations and bounds</small></span></a></li>
-            <li class="milestone"><a href="docs/rendered-notebooks/09_render_thesis_figures.html"><span class="check" aria-hidden="true">✓</span><span><strong>Publication figures</strong><small>Deterministic rendering</small></span></a></li>
+            <li class="milestone"><a href="docs/rendered-notebooks/09_render_thesis_figures.html"><span class="check" aria-hidden="true">✓</span><span><strong>Thesis figures</strong><small>Provenance-aware rendering</small></span></a></li>
         </ol>
     </div>
 </section>
 
 <section aria-labelledby="chapters-title">
-    <div class="section-heading"><div><p class="eyebrow">At a glance</p><h2 id="chapters-title">Research chapters</h2></div></div>
+    <div class="section-heading"><div><p class="eyebrow">At a glance</p><h2 id="chapters-title">Research path</h2></div></div>
     <div class="chapter-grid">
         <article class="chapter-card"><span class="number">01 · Foundations</span><h3>Numerical objectives</h3><p>SUPG parameters, stabilized finite elements, objective functions, and direct optimization.</p><a href="docs/rendered-notebooks/01_supg_objectives.html">Read notebook</a></article>
         <article class="chapter-card"><span class="number">02 · Chapter 4</span><h3>Initial ML approach</h3><p>Heterogeneous data with supervised and adjoint-backed architecture comparisons.</p><a href="docs/rendered-notebooks/05_ch4_evaluate_models.html">Read evaluation</a></article>
-        <article class="chapter-card"><span class="number">03 · Chapter 5</span><h3>Revised target and models</h3><p>An AFC-BJK reference, revised learning target, and wider MLP and GATv2 models.</p><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html">Read analysis</a></article>
-        <article class="chapter-card"><span class="number">04 · Publication</span><h3>Evidence and figures</h3><p>Deterministic figure rendering and an interactive gallery of numerical cases.</p><a href="docs/rendered-notebooks/09_render_thesis_figures.html">Read figure workflow</a></article>
+        <article class="chapter-card"><span class="number">03 · Results</span><h3>Evidence and limitations</h3><p>The architecture search, negative results, mesh sensitivity, and qualified thesis conclusion.</p><a href="site/results/">Read the research path</a></article>
+        <article class="chapter-card"><span class="number">04 · Chapter 5</span><h3>Revised AFC-BJK study</h3><p>A stronger reference, revised learning target, wider models, and target-ambiguity analysis.</p><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html">Read analysis</a></article>
     </div>
 </section>
 
+<section aria-labelledby="thesis-result-title">
+    <div class="section-heading"><div><p class="eyebrow">Submitted thesis · Chapter 4</p><h2 id="thesis-result-title">Promising, but not uniformly physical</h2><p>The local MLP produced the best individual results but more unusable predictions; GATv2 produced fewer unusable cases and generalized best across the heterogeneous test set.</p></div></div>
+    <figure class="result-figure">
+        <img src="docs/assets/thesis-figures/Ex3_P1_32x32_yeq_x_by_sqrt3.png" alt="Optimized SUPG and learned model line plots for thesis benchmark 3 on a triangular mesh">
+        <figcaption>Benchmark 3 line cut: direct optimization compared with GATv2, MLP, and GCN predictions. The different layer locations show why the study reports solution behaviour alongside parameter loss.</figcaption>
+    </figure>
+</section>
+
 <section aria-labelledby="comparison-title">
-    <div class="section-heading"><div><p class="eyebrow">Chapter 5</p><h2 id="comparison-title">AFC-BJK reference comparison</h2><p>Outflow and crosswind line cuts compare the robust AFC-BJK reference with optimized and learned SUPG solutions.</p></div></div>
+    <div class="section-heading"><div><p class="eyebrow">Submitted thesis · Chapter 5</p><h2 id="comparison-title">AFC-BJK reference comparison</h2><p>Outflow and crosswind line cuts compare the robust AFC-BJK reference with optimized and learned SUPG solutions.</p></div></div>
     <figure class="result-figure">
         <img src="docs/assets/thesis-figures/revised_results_lineplots.png" alt="Outflow and crosswind line plots comparing AFC-BJK, optimized SUPG, MLP, and GATv2 solutions">
-        <figcaption>Historical thesis figure export. It provides orientation for the revised study; the rendered Chapter 5 notebooks explain the target, training, and limitations.</figcaption>
+        <figcaption>Historical thesis figure export. It provides orientation for the revised study; notebooks 06–08 explain the target, training, and limitations.</figcaption>
     </figure>
 </section>
 

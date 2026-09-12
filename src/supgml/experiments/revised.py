@@ -116,8 +116,11 @@ def run_revised_training(config):
         )
         best_fem = float("inf")
         samples = []
+        epochs = config.get("epochs_by_architecture", {}).get(
+            architecture, config["epochs"]
+        )
 
-        for epoch in range(config["epochs"]):
+        for epoch in range(epochs):
             model.train()
             if loader is not None:
                 supervised = 0.0
@@ -140,7 +143,7 @@ def run_revised_training(config):
                 supervised = loss.item()
             scheduler.step(epoch + 1)
 
-            if epoch % selection_every == 0 or epoch + 1 == config["epochs"]:
+            if epoch % selection_every == 0 or epoch + 1 == epochs:
                 model.eval()
                 with torch.no_grad():
                     if loader is None:

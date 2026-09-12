@@ -33,6 +33,11 @@ The ordered thesis workflow is documented in
 [`notebooks/README.md`](notebooks/README.md). Original submitted notebooks and
 abandoned or inconclusive experiments are preserved under `notebooks/archive`.
 
+For the scientific narrative—dataset, architecture search, reported failures,
+and conclusions—start with [`docs/results.md`](docs/results.md). Notebooks 01–05
+cover the foundations and Chapter 4 experiments; notebooks 06–09 cover the
+revised supervised approach in Chapter 5.
+
 ## Package overview
 
 - `supgml.fem`: finite-element interpolation, assembly, sampling, and plotting.

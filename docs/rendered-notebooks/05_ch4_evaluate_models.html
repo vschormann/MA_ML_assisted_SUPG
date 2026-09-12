@@ -7580,13 +7580,30 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=findings">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-Read-the-comparison-as-evidence,-not-a-leaderboard">3. Read the comparison as evidence, not a leaderboard<a class="anchor-link" href="#3.-Read-the-comparison-as-evidence,-not-a-leaderboard">¶</a></h2><p>The submitted experiments support three claims:</p>
+<ol>
+<li>The local MLP produced the best individual results on several SPDEs, but also more unusable predictions.</li>
+<li>GATv2 produced fewer unusable cases and had the best overall generalization.</li>
+<li>Loss values alone did not reliably identify physical solutions, especially across different objectives and mesh configurations.</li>
+</ol>
+<p>The useful conclusion is that adjacent-cell information can help on a heterogeneous dataset—not that GATv2 wins every case or solves parameter selection. The illustrated account is in <code>docs/results.md</code>; the original fields, line cuts, and exploratory comparisons remain in <code>archive/chapter4/Test_set_analysis.ipynb</code>.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=scope">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Alternative graph structures and dense-attention experiments are archived because they do not support the final Chapter 4 comparison. This notebook is intentionally limited to MLP/GCN/GraphSAGE/GAT/GATv2 on the 14-case test set.</p>
+<h2 id="4.-Separate-reported-and-exploratory-work">4. Separate reported and exploratory work<a class="anchor-link" href="#4.-Separate-reported-and-exploratory-work">¶</a></h2><p>The thesis reports MLP, GCN, GraphSAGE, GAT, and GATv2. Dense attention, MHA, sensitivity edges, globalized graphs, and clamping experiments are retained under <code>archive/alternative_graphs/</code> because they were exploratory or inconclusive. Keeping those failures discoverable—without mixing them into the final comparison—is part of the research record.</p>
 </div>
 </div>
 </div>
