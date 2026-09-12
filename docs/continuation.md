@@ -50,12 +50,8 @@ should be labelled as new work and should not be described as a thesis result.
    selected `experiments/*.json` file. Check graph feature names and order,
    schema version, mesh IDs, target and bound shapes, and the training/test
    split before training.
-3. Validate the configuration without starting a long run:
-
-   ```bash
-   supgml-train experiments/ch4_supervised.json --dry-run
-   ```
-
+3. Validate the configuration without starting a long run with
+   `supgml-train experiments/ch4_supervised.json --dry-run`.
 4. Treat the full commands as new runs of the refactored runner. Chapter 4 uses
    20,000 epochs; Chapter 5 uses 200,000 MLP epochs and 150,000 GATv2 epochs,
    and FEM-backed evaluation can be expensive.

@@ -31,7 +31,7 @@ of unrelated notebooks:
    submitted notebooks.
 5. **[Follow the Chapter 5 revision](tutorials/revised-study.md).** Guided
    notebooks 06–09 introduce the AFC-BJK reference, revised models,
-   target-ambiguity analysis, and deterministic figure rendering.
+   target-ambiguity analysis, and figure-provenance guidance.
 
 ### Read the notebooks in a browser
 
