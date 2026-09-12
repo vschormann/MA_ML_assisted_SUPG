@@ -49,7 +49,7 @@ a { color: inherit; }
 .hero h1 { max-width: 850px; margin: 0; font-size: clamp(2.35rem, 6vw, 5rem); line-height: .98; letter-spacing: -.045em; }
 .hero-copy { max-width: 760px; margin: 24px 0 30px; color: #dbe9e6; font-size: clamp(1rem, 2vw, 1.2rem); }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; }
-.badge, .hero-link {
+.hero-link {
     display: inline-flex;
     align-items: center;
     min-height: 38px;
@@ -60,11 +60,20 @@ a { color: inherit; }
     font-weight: 700;
     text-decoration: none;
 }
-.badge { border-color: #8cd2c4; color: #dff8f2; background: rgba(80, 180, 160, .15); }
-.badge::before { content: ""; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #76ddc8; }
 .hero-link:hover { background: rgba(255,255,255,.1); }
 main { padding: 52px 0 80px; }
 section + section { margin-top: 68px; }
+.provenance-note {
+    margin-bottom: 52px;
+    padding: 18px 22px;
+    border-left: 4px solid var(--warm);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+.provenance-note strong { color: var(--ink); }
+.provenance-note a { color: var(--accent-dark); font-weight: 750; text-underline-offset: 3px; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .section-heading .eyebrow { color: var(--accent); }
 .section-heading h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.5rem); letter-spacing: -.035em; }
@@ -151,8 +160,8 @@ section + section { margin-top: 68px; }
         <h1>Machine-learning-assisted SUPG</h1>
         <p class="hero-copy">Learning stabilization parameters for singularly perturbed convection–diffusion problems using finite-element solvers and graph neural networks.</p>
         <div class="hero-meta">
-            <span class="badge">Thesis submitted</span>
-            <a class="hero-link" href="site/results/">Read results</a>
+            <a class="hero-link" href="https://www.wias-berlin.de/people/john/BETREUUNG/master_schormann.pdf" target="_blank" rel="noopener">Submitted thesis (PDF)</a>
+            <a class="hero-link" href="docs/results.html">Read results</a>
             <a class="hero-link" href="docs/rendered-notebooks/index.html">Read rendered notebooks</a>
             <a class="hero-link" href="#chapters-title">Explore workflow</a>
         </div>
@@ -160,6 +169,14 @@ section + section { margin-top: 68px; }
 </header>
 
 <main class="page-shell">
+<aside class="provenance-note" aria-label="Repository provenance">
+    <strong>Submission snapshot and later refactoring.</strong>
+    Commit <a href="https://github.com/search?q=aed55ecdaf7c99b4f0f89662e48eab106de8013f&amp;type=commits"><code>aed55ecdaf7c99b4f0f89662e48eab106de8013f</code></a>
+    records the repository immediately before thesis submission. Subsequent
+    changes reorganize and document the same research for better readability,
+    reproducibility, and reuse. This refactoring was carried out with assistance
+    from OpenAI Codex; it does not change the version submitted for assessment.
+</aside>
 <section aria-labelledby="progress-title">
     <div class="section-heading">
         <div>
@@ -193,7 +210,7 @@ section + section { margin-top: 68px; }
     <div class="chapter-grid">
         <article class="chapter-card"><span class="number">01 · Foundations</span><h3>Numerical objectives</h3><p>SUPG parameters, stabilized finite elements, objective functions, and direct optimization.</p><a href="docs/rendered-notebooks/01_supg_objectives.html">Read notebook</a></article>
         <article class="chapter-card"><span class="number">02 · Chapter 4</span><h3>Initial ML approach</h3><p>Heterogeneous data with supervised and adjoint-backed architecture comparisons.</p><a href="docs/rendered-notebooks/05_ch4_evaluate_models.html">Read evaluation</a></article>
-        <article class="chapter-card"><span class="number">03 · Results</span><h3>Evidence and limitations</h3><p>The architecture search, negative results, mesh sensitivity, and qualified thesis conclusion.</p><a href="site/results/">Read the research path</a></article>
+        <article class="chapter-card"><span class="number">03 · Results</span><h3>Evidence and limitations</h3><p>The architecture search, negative results, mesh sensitivity, and qualified thesis conclusion.</p><a href="docs/results.html">Read the research path</a></article>
         <article class="chapter-card"><span class="number">04 · Chapter 5</span><h3>Revised AFC-BJK study</h3><p>A stronger reference, revised learning target, wider models, and target-ambiguity analysis.</p><a href="docs/rendered-notebooks/08_ch5_analyze_revised_models.html">Read analysis</a></article>
     </div>
 </section>
