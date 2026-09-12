@@ -7516,9 +7516,10 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Chapter-4-supervised-architecture-comparison">Chapter 4 supervised architecture comparison<a class="anchor-link" href="#Chapter-4-supervised-architecture-comparison">¶</a></h1><p><strong>Status:</strong> canonical thesis experiment<br/>
+<h1 id="Chapter-4-supervised-architecture-comparison">Chapter 4 supervised architecture comparison<a class="anchor-link" href="#Chapter-4-supervised-architecture-comparison">¶</a></h1><p><strong>Role:</strong> maintained post-submission guide<br/>
+<strong>Execution scope:</strong> loads the refactored configuration; a full run requires ignored Chapter 4 data<br/>
 <strong>Thesis sections:</strong> 2.5, 3, 4</p>
-<p>Supervised learning asks each architecture to reproduce the optimized cellwise SUPG parameter. This notebook makes the common task and model interface visible; the configuration runner removes accidental differences between five copied training scripts.</p>
+<p>Supervised learning asks each architecture to reproduce the optimized cellwise SUPG parameter. This notebook makes the common task and model interface visible; the configuration runner removes accidental differences between five copied training scripts. That runner was created after submission and does not claim to be the exact historical execution path.</p>
 </div>
 </div>
 </div>
@@ -7609,7 +7610,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Run <code>supgml-train experiments/ch4_supervised.json</code> from the repository root. The runner fixes split, seed, optimizer, and output directory across MLP/GCN/GraphSAGE/GAT/GATv2; inspect its recorded history rather than comparing notebook-cell output. The long submitted traces remain in <code>archive/chapter4/Train_*.ipynb</code> as evidence, not tutorial content.</p>
+<p>Validate the post-submission configuration with <code>supgml-train experiments/ch4_supervised.json --dry-run</code> from the repository root. A full command requires the ignored Chapter 4 graphs and creates a new run under <code>runs/</code>; it does not recreate the submitted checkpoints from a fresh clone. The long submitted traces remain in <code>archive/chapter4/Train_*.ipynb</code> as historical evidence.</p>
 </div>
 </div>
 </div>

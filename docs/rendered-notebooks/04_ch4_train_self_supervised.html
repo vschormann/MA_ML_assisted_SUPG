@@ -7516,9 +7516,10 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Chapter-4-self-supervised-architecture-comparison">Chapter 4 self-supervised architecture comparison<a class="anchor-link" href="#Chapter-4-self-supervised-architecture-comparison">¶</a></h1><p><strong>Status:</strong> canonical thesis experiment<br/>
+<h1 id="Chapter-4-self-supervised-architecture-comparison">Chapter 4 self-supervised architecture comparison<a class="anchor-link" href="#Chapter-4-self-supervised-architecture-comparison">¶</a></h1><p><strong>Role:</strong> maintained post-submission guide<br/>
+<strong>Execution scope:</strong> shows the adjoint bridge and config; a full run requires ignored data and FEM solvers<br/>
 <strong>Thesis sections:</strong> 2.4, 3, 4</p>
-<p>This notebook shows the key interface that made self-supervision possible: PyTorch proposes cellwise SUPG parameters, DOLFINx evaluates the state/adjoint objective and its gradient, and PyTorch receives that gradient during <code>backward()</code>. The experiment loop is configuration driven so all five architecture runs remain comparable.</p>
+<p>This notebook shows the key interface that made self-supervision possible: PyTorch proposes cellwise SUPG parameters, DOLFINx evaluates the state/adjoint objective and its gradient, and PyTorch receives that gradient during <code>backward()</code>. The configuration runner was created after submission to make new architecture runs comparable; it is not the exact historical execution path.</p>
 </div>
 </div>
 </div>
@@ -7601,7 +7602,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Run from the repository root with <code>supgml-train experiments/ch4_self_supervised.json</code> inside the supported DOLFINx environment. The batch size remains one because each graph invokes its corresponding state-and-adjoint FEM solver. The command stores checkpoints and loss histories under <code>runs/ch4_self_supervised</code>; submitted traces are retained in <code>archive/chapter4/*_self_supervised.ipynb</code>.</p>
+<p>Validate the post-submission configuration with <code>supgml-train experiments/ch4_self_supervised.json --dry-run</code>. A full command requires the ignored graph/mesh cases in a supported DOLFINx environment and writes a new run to <code>runs/ch4_self_supervised</code>. The submitted traces remain in <code>archive/chapter4/*_self_supervised.ipynb</code>.</p>
 </div>
 </div>
 </div>
