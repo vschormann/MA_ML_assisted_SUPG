@@ -48,5 +48,7 @@ repository = CaseRepository("data")
 # repository.save(case_id, solver, graph, split="train")
 ```
 
-The executable counterpart is `notebooks/02_ch4_generate_dataset.ipynb`.
-Continue with [Tutorial 3](learning.md) for supervised and FEM-backed learning.
+The guided counterpart is `notebooks/02_ch4_generate_dataset.ipynb`. It
+documents the case matrix and schema; its expensive generation calls are
+interface sketches rather than a complete generator. Continue with
+[Tutorial 3](learning.md) for supervised and FEM-backed learning.

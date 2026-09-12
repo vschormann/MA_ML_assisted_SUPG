@@ -4,6 +4,11 @@ This page is the shortest route through the scientific work. It connects the
 initial heterogeneous study in Chapter 4 with the revised AFC-BJK study in
 Chapter 5, while keeping the raw submitted notebooks available for audit.
 
+The numbers and conclusions below report the submitted thesis. The maintained
+package and numbered notebooks were created later to make the work easier to
+read; because `data/` and `runs/` are ignored, they are not presented as an
+independent reproduction of these results.
+
 ## The question
 
 The project asks whether a model can predict one SUPG stabilization parameter

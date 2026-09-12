@@ -37,9 +37,10 @@ loss = fem_objective(model(graph))
 loss.backward()
 ```
 
-Validate every new FEM objective against finite differences. Run the documented
-experiment matrices with `supgml-train experiments/ch4_supervised.json` and
-`supgml-train experiments/ch4_self_supervised.json`.
+Validate every new FEM objective against finite differences. The two JSON files
+describe the refactored Chapter 4 runs and can be checked with `--dry-run`.
+Starting a full command requires the ignored graph/mesh inputs and creates a new
+post-submission run; see the [continuation guide](../continuation.md).
 
 The reported outcome was mixed: the local MLP produced the best individual
 results but more unusable predictions, while GATv2 produced fewer unusable

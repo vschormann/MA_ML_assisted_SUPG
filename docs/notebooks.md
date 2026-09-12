@@ -1,8 +1,16 @@
-# Notebook map
+# Guided notebook and archive map
 
 Nine ordered notebooks under `notebooks/` follow the thesis argument.
+They are maintained, post-submission guides to the refactored interfaces; they
+are not the submitted notebooks or a complete replay of the historical runs.
 Reusable definitions have a canonical home in `supgml`; all 32 submitted
 notebooks and their outputs are retained under `notebooks/archive/`.
+
+The numbered notebooks contain a mixture of runnable examples, configuration
+loading, and commented interface templates. Full training additionally depends
+on `data/` and writes to `runs/`; both are ignored. `notebooks/README.md`
+records the execution scope of every stage, and
+[Continuing this work](continuation.md) explains the artefact requirements.
 
 The canonical sequence is:
 
@@ -16,7 +24,13 @@ The canonical sequence is:
 8. Chapter 5 perturbation and revised-model analysis; and
 9. deterministic research-figure rendering.
 
-## Data preparation
+## How the submitted notebooks map to maintained APIs
+
+The tables below list submitted or exploratory filenames. They explain where a
+reader can find their reusable mechanics now; they do not imply that the
+archived files were rewritten or re-executed after submission.
+
+### Data preparation
 
 | Notebook | Responsibility | Canonical package API |
 | --- | --- | --- |
@@ -24,7 +38,7 @@ The canonical sequence is:
 | `edge_attr_set_creation.ipynb` | geometric and sensitivity edges | `supgml.graph.relative_position`, `finite_difference_sensitivity` |
 | `redo_graphs.ipynb` | graph-schema migration | `supgml.graph`, `supgml.data` |
 
-## Numerical methods
+### Numerical methods
 
 | Notebook | Responsibility | Canonical package API |
 | --- | --- | --- |
@@ -32,7 +46,7 @@ The canonical sequence is:
 | `revised_approximations.ipynb` | Tabata and AFC comparisons | `supgml.stabilization` |
 | `activation_plot.ipynb` | saturating loss inspection | `supgml.supg.SaturatingLoss` |
 
-## Supervised model experiments
+### Supervised model experiments
 
 `Train_MLP`, `Train_GCN`, `Train_SAGE`, `Train_GAT`, `Train_GATv2`,
 `Train_Attention`, `Train_MHA`, `Train_edge_attr`, and `Train_globalizer`
@@ -46,14 +60,14 @@ Files containing `copy` are preserved in the archive as experiment snapshots,
 not package sources. In particular, `Train_revised copy.ipynb` contains the
 revised GATv2 experiment.
 
-## FEM-backed training
+### FEM-backed training
 
 The notebooks whose names end in `_self_supervised`, together with
 `self_supervised_training.ipynb`, differentiate the FEM objective through an
 adjoint gradient. The canonical implementation is in `supgml.autograd` and
 `supgml.training.self_supervised_train`.
 
-## Evaluation and publication
+### Evaluation and publication
 
 | Notebook | Responsibility | Canonical package API |
 | --- | --- | --- |

@@ -4,25 +4,33 @@
 machine-learning code developed for the thesis on learning SUPG parameters for
 singularly perturbed convection–diffusion problems.
 
+!!! note "Submission record versus maintained guide"
+    The submitted state is commit `aed55ec`; the notebooks under
+    `notebooks/archive/` preserve the executed historical workflows. The nine
+    numbered notebooks and the `supgml` package are post-submission explanatory
+    refactorings. Historical data, checkpoints, and new run outputs are ignored,
+    so a fresh clone does not reproduce the full training runs. Read
+    [Continuing this work](continuation.md) for the precise artefact boundary.
+
 ## Start here
 
 The repository is best read as a short scientific workflow, not as a collection
 of unrelated notebooks:
 
-1. **[Define and stabilize a PDE](tutorials/supg.md).** Notebook 01 shows the
+1. **[Define and stabilize a PDE](tutorials/supg.md).** Guided notebook 01 shows the
    mesh, finite-element spaces, weak form, cellwise SUPG parameter, objective,
    and discrete adjoint.
-2. **[Create graph learning cases](tutorials/graphs.md).** Notebook 02 maps FEM
+2. **[Create graph learning cases](tutorials/graphs.md).** Guided notebook 02 maps FEM
    cells and fields to a documented graph schema, with optimized cellwise
    parameters as targets.
-3. **[Compare the thesis models](tutorials/learning.md).** Notebooks 03–05
+3. **[Compare the thesis models](tutorials/learning.md).** Guided notebooks 03–05
    compare MLP, GCN, GraphSAGE, GAT, and GATv2 using supervised and
    adjoint-backed objectives.
 4. **[Read the results and research path](results.md).** This concise account
    restores the experimental findings and negative results preserved by the
    submitted notebooks.
-5. **[Follow the Chapter 5 revision](tutorials/revised-study.md).**
-   Notebooks 06–09 introduce the AFC-BJK reference, revised models,
+5. **[Follow the Chapter 5 revision](tutorials/revised-study.md).** Guided
+   notebooks 06–09 introduce the AFC-BJK reference, revised models,
    target-ambiguity analysis, and deterministic figure rendering.
 
 ### Read the notebooks in a browser
@@ -30,7 +38,9 @@ of unrelated notebooks:
 For Safari, start with the [rendered notebook collection](rendered-notebooks.md).
 It links to the HTML export of every canonical notebook and requires neither a
 Jupyter kernel nor a Python installation. The `.ipynb` files are the editable,
-executable sources; the HTML pages are the browser-reading version.
+maintained sources; the HTML pages are the browser-reading versions. Individual
+cells can be run when their stated inputs are available, but the sequence is a
+guide rather than a complete replay of the submitted computations.
 
 The [canonical notebook map](notebooks.md) explains their thesis roles, and
 `notebooks/README.md` records the execution order.
@@ -64,9 +74,10 @@ of numerical infrastructure.
 | Goal | Begin with | Main package areas |
 | --- | --- | --- |
 | Understand SUPG and the adjoint | Notebook 01 | `supgml.supg`, `supgml.fem`, `supgml.stabilization` |
-| Recreate the submitted thesis study | Notebooks 02–05 | `supgml.graph`, `supgml.data`, `supgml.models`, `supgml.training` |
-| Recreate the Chapter 5 study | Notebooks 06–08 | `supgml.stabilization`, `supgml.autograd`, `supgml.experiments` |
+| Audit the submitted Chapter 4 study | Archived notebooks plus guided notebooks 02–05 | `supgml.graph`, `supgml.data`, `supgml.models`, `supgml.training` |
+| Understand the Chapter 5 revision | Archived notebooks plus guided notebooks 06–08 | `supgml.stabilization`, `supgml.autograd`, `supgml.experiments` |
 | Reuse a component in new work | [API guide](api.md) | the relevant `supgml.*` subpackage |
+| Plan a new experiment | [Continuation guide](continuation.md) | configuration, input artefacts, and provenance |
 
 ## Installation and provenance
 
@@ -82,4 +93,5 @@ the macOS PyTorch/OpenMP kernel issue. Commit
 `aed55ecdaf7c99b4f0f89662e48eab106de8013f` records the repository at thesis
 submission; later commits are readability and reuse refactorings. Submitted and
 abandoned exploratory notebooks are retained in the archive rather than being
-presented as final workflows.
+presented as final workflows. The refactoring and documentation after that
+commit were developed with assistance from OpenAI Codex.

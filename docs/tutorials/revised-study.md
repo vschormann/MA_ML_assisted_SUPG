@@ -32,8 +32,13 @@ evaluation. The selected checkpoint has the lowest AFC-BJK FEM loss, not merely
 the lowest training loss.
 
 ```bash
+supgml-train experiments/ch5_revised.json --dry-run
 supgml-train experiments/ch5_revised.json
 ```
+
+The first command only validates the refactored configuration. The full command
+requires the ignored revised graph and mesh named in that file, runs for up to
+200,000 epochs, and creates a new post-submission run under `runs/`.
 
 ## Interpret carefully
 
@@ -42,5 +47,7 @@ parameter targets can be non-unique and why long-range graph information may
 help. Compare target loss, FEM loss, fields, and line plots together before
 drawing conclusions.
 
-Use notebooks 06–08 for the executable study and notebook 09 for reproducible
-reported figures.
+Use notebooks 06–08 as a guided account of the study and notebook 09 as a
+figure-provenance template. The historical inputs and executed outputs are not
+tracked in a fresh clone; consult the [continuation guide](../continuation.md)
+and the submitted notebook archive before attempting a new run.

@@ -3,8 +3,12 @@
 These are static HTML exports of the nine canonical notebooks. They open in
 Safari or any other browser without Jupyter, Python, or a running kernel.
 They are documentation snapshots: code is shown but not executed in the
-browser. Use the corresponding `.ipynb` file when you want to run or modify an
-experiment.
+browser. Here, **canonical** means the maintained explanatory notebook, not the
+file submitted with the thesis. Some cells are runnable examples; later stages
+also contain commented interface sketches or require ignored data and run
+artefacts. Use the corresponding `.ipynb` file to modify the guide, and use the
+[continuation guide](continuation.md) to determine what is required for a new
+run. The executed historical notebooks are under `notebooks/archive/`.
 
 | Notebook | Browser version | Purpose |
 | --- | --- | --- |
@@ -18,7 +22,8 @@ experiment.
 | 08 | [Chapter 5 analysis](rendered-notebooks/08_ch5_analyze_revised_models.html) | Target ambiguity and model interpretation |
 | 09 | [Thesis figure rendering](rendered-notebooks/09_render_thesis_figures.html) | Read-only figure provenance |
 
-To regenerate the exports after editing a canonical notebook, run this command
+To regenerate these documentation snapshots after editing a guided notebook,
+run this command
 from the repository root:
 
 ```bash
@@ -26,6 +31,6 @@ python -m jupyter nbconvert --to html --output-dir docs/rendered-notebooks \
   notebooks/*.ipynb
 ```
 
-The archive is intentionally not exported: it preserves submitted and
+The archive is intentionally not exported here: it preserves submitted and
 exploratory evidence, whereas this page is a browser-readable guide to the
-canonical workflow.
+maintained workflow.

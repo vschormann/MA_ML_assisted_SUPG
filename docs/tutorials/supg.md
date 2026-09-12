@@ -83,5 +83,5 @@ gradient = solver.grad()
 ```
 
 Continue in [Tutorial 2](graphs.md) to turn this FEM state and optimized
-parameter field into a graph-learning case. The executable counterpart is
+parameter field into a graph-learning case. The runnable guided counterpart is
 `notebooks/01_supg_objectives.ipynb`.
